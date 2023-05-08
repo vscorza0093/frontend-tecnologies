@@ -66,11 +66,11 @@ There's a lot of tags available to build a web page, and a great place to consul
 
 * Formatting elements
 
-`<b>`       ->  bold
-`<strong>`  ->  strong
-`<i>`       ->  italic
-`<sup>`     ->  superior text
-`<sub>`     ->  inferior text
+`<b>`       -  bold
+`<strong>`  -  strong
+`<i>`       -  italic
+`<sup>`     -  superior text
+`<sub>`     -  inferior text
 
 ## CSS
 
@@ -127,17 +127,154 @@ A great example is `:hover` that changes a pre-seted button color when the user 
 ```
 
 Other examples
-    `:active`       ->  Verify if a link is active
-    `:checked`      ->  Used with selection of radio, check or option elements
-    `:disabled`     ->  Represents disabled state
-    `:focus`        ->  When a element get focus
-    `:nth-child`    ->  Select based on group positions
+`:active`       -  Verify if a link is active
+`:checked`      -  Used with selection of radio, check or option elements
+`:disabled`     -  Represents disabled state
+`:focus`        -  When a element get focus
+`:nth-child`    -  Select based on group positions
 
 
+### Positioning
+
+Element positioning on a web site is crucial for the good usability and style.
+Develop a bad interface could ruin our project
+
+By default all new element has your positioning set as static `position: static`. To change this initial behaviour we could use five values to `position` property:
+
+1. absolute
+2. fixed
+3. relative
+4. static
+5. sticky
+
+Each of those values allows a specific behaviour for the component that are receiving it
+
+To use a value like `relative` we should first understand how the hierarchy was created between the elements.
+This could be a hindrance, like when we have a lot of nested elements.
+
+(pt-br) article to understand how to handle with positioning
+https://www.devmedia.com.br/position-css-definindo-a-posicao-de-elementos-com-fixed-relative-e-absolute/37700
+
+### position: relative
+
+* This property specifies a relative position of the element related to the father element
+
+This position is defined trough four other propertys: `top`,`bottom`,`left` & `right` that indicates the distance related to the top, bottom, left and/or right, taking as reference the father element.
 
 
+### position: absolute
+
+* This property "takes the element off the hierarchy". In fact, turns the element a children of the whole page, and not of a single element. 
+
+Now, we could position this element in any place of the page. This could be useful in cases that we need to posite an alert box without breaking the page layout.
+
+Despite this possibility, is also important to use the `position: absolute` with caution, once that, because this hierarchy change, all the page responsivity could be broken.
 
 
+## position: fixed
+
+* Fixed position works on a different way. Although the similarity between `fixed` and `absolute` exists, using `fixed`, the element will respond, in layout terms, to the browser.
+It means that, although we scroll up and down the website, the element will stay fixed on the same position
+
+This kind of property is specially useful to develop menus, so the user will never loose navigation options when using our website.
 
 
+## Responsive Design
 
+Basically, responsivity is the capability that we give to an website to be auto adaptable to any screen resolution
+
+Today it seems obvious, but in the beginning of the internet, this caused many problems with elements and malfunctions.
+
+(en) quite old but exceptional article about responsive design, retrating the begginnings of the approach
+https://alistapart.com/article/responsive-web-design/
+
+
+## Flexbox
+
+Its a universal layout model that can be used to different screen resolutions, allowing dynamic adjustments, whitout worring about positioning of a bunch of elements at once
+
+_from Wikipedia_
+CSS Flexible Box Layout, commonly known as Flexbox,is a CSS 3 web layout model.It is in the W3C's candidate recommendation (CR) stage. The flex layout allows responsive elements within a container to be automatically arranged depending on viewport (device screen) size.
+
+By default elements respects the order that they are positioned, so, we have to manage them to get different responses
+
+The main flexbox commands are:
+
+`justify-content` CSS property aligns items horizontally and accepts the following values: 
+```css
+justify-content: flex-start; #default value -> posite the elements on left side of the page
+justify-content: flex-end;                  -> posite the elements on the right side of the page
+justify-content: center;                    -> posite the elements on the center of the page
+justify-content: space-between;             -> posite the elements on the page with equal space between
+justify-content: space-around;              -> posite the elements on the page with equal space around
+```
+
+`align-items` CSS property aligns items vertically and accepts the following values:
+```css
+align-items: flex-start;                    -> Items align to the top of the container.
+align-items: flex-end;                      -> Items align to the bottom of the container.
+align-items: center;                        -> Items align at the vertical center of the container.
+align-items: baseline;                      -> Items display at the baseline of the container.
+align-items: stretch;                       -> Items are stretched to fit the container.
+```
+
+`flex-direction` CSS property defines the direction items are placed in the container, and accepts the following values:
+```css
+flex-direction: row;                        -> Items are placed the same as the text direction.
+flex-direction: row-reverse;                -> Items are placed opposite to the text direction.
+flex-direction: column;                     -> Items are placed top to bottom.
+flex-direction: column-reverse;             -> Items are placed bottom to top.
+```
+
+* Notice that when the flex direction is a column, justify-content changes to the vertical and align-items to the horizontal.
+
+`flex-wrap` CSS property spread items out, which accepts the following values:
+```css
+flex-wrap: nowrap;                          -> Every item is fit to a single line.
+flex-wrap: wrap;                            -> Items wrap around to additional lines.
+flex-wrap: wrap-reverse;                    -> Items wrap around to additional lines in reverse.
+```
+
+* The two properties `flex-direction` and `flex-wrap` are used so often together that the shorthand property `flex-flow` was created to combine them. This shorthand property accepts the value of the two properties separated by a space. 
+For example, you can use `flex-flow: row wrap` to set rows and wrap them.
+Any combination is possible
+```css
+flex-flow: wrap column;
+flex-flow: nowrap column-reverse;
+flex-flow: wrap-reverse row;
+```
+
+`align-content` CSS property is used to set how multiple lines are spaced apart from each other. This property takes the following values:
+```css
+align-content: flex-start:                  -> Lines are packed at the top of the container.
+align-content: flex-end:                    -> Lines are packed at the bottom of the container.
+align-content: center:                      -> Lines are packed at the vertical center of the container.
+align-content: space-between:               -> Lines display with equal spacing between them.
+align-content: space-around:                -> Lines display with equal spacing around them.
+align-content: stretch:                     -> Lines are stretched to fit the container.
+```
+* This can be confusing, but align-content determines the spacing between lines, while align-items determines how the items as a whole are aligned within the container. When there is only one line, align-content has no effect.
+
+
+* Sometimes reversing the row or column order of a container is not enough. In these cases, we can apply the order property to individual items. By default, items have a value of 0, but we can use this property to also set it to a positive or negative integer value (-2, -1, 0, 1, 2).
+
+`order`
+```css
+order: 1;
+```
+
+* Another property you can apply to individual items is `align-self`. This property accepts the same values as align-items and its value for the specific item.
+
+
+Comprehensive guide to CSS flexbox layout.
+https://css-tricks.com/snippets/css/a-guide-to-flexbox/
+
+Webpages to flexbox training
+
+Flexbox Zombie
+https://mastery.games/post/flexboxzombies2/
+
+Flexbox Froggy
+https://flexboxfroggy.com/
+
+## Bootstrap
