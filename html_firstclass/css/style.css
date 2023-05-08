@@ -1,0 +1,36 @@
+h1{
+    font-size: 36px;
+    padding-right: 20%;
+}
+
+ul{
+    list-style: none;
+}
+
+li{
+    display: inline-block;
+    margin-right: 10px;
+}
+
+a{
+    text-decoration: none;
+    color: #000;
+}
+
+a:hover{
+    text-decoration:underline;
+    color: #fF0;
+}
+#div-header{
+    width: 300;
+    height: 5;
+    background-color: #bdd7ff;
+    padding: 2%;
+    display: flex;
+    align-items: baseline;
+    justify-content: baseline;
+}
+.login{
+    font-weight: bold;
+    color: #004cbe;
+}
