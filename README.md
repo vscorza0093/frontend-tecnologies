@@ -127,11 +127,11 @@ A great example is `:hover` that changes a pre-seted button color when the user 
 ```
 
 Other examples
-`:active`       ->  Verify if a link is active
-`:checked`      ->  Used with selection of radio, check or option elements
-`:disabled`     ->  Represents disabled state
-`:focus`        ->  When a element get focus
-`:nth-child`    ->  Select based on group positions
+    `:active`       ->  Verify if a link is active
+    `:checked`      ->  Used with selection of radio, check or option elements
+    `:disabled`     ->  Represents disabled state
+    `:focus`        ->  When a element get focus
+    `:nth-child`    ->  Select based on group positions
 
 
 
