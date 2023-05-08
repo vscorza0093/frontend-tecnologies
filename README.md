@@ -277,4 +277,55 @@ https://mastery.games/post/flexboxzombies2/
 Flexbox Froggy
 https://flexboxfroggy.com/
 
-## Bootstrap
+
+## Grid
+
+Great content to learn and train the foundamentals of Grid
+https://codepip.com/games/grid-garden/
+
+From wikipedia:
+
+In Cascading Style Sheets, CSS grid layout or CSS grid creates complex responsive web design grid layouts more easily and consistently across browsers. Historically, there have been other methods for controlling web page layout methods, such as tables, floats, and more recently, CSS Flexible Box Layout (flexbox). CSS grid is currently not an official standard (it is a W3C Candidate Recommendation) although it has been adopted by the recent versions of all current major browsers.
+
+CSS grid can create more robust and flexible layouts than the previous options like CSS floats. It also allows for more standardized code that works across browsers. This is in contrast to relying on specific browser hacks or complicated workarounds.
+
+One issue with exploiting floats in CSS is that if content gets added to one portion of the page it could disrupt the flow of the page and break the layout. This is due to the varying heights for layout elements.Though flexbox supports flexible layouts and provides the flexibility of creating complex layouts, it fails when the need for creating responsive layouts in 2-dimensional space arises.
+
+`grid-column-start` CSS property specifies a grid item's start position within the grid columns
+For example, grid-column-start: 3; will posite the item starting at the 3rd vertical grid line, which is another way of saying the 3rd vertical border from the left in the grid.
+
+When `grid-column-start` is used alone, the grid item by default will span exactly one column. However, you can extend the item across multiple columns by adding the `grid-column-end` property.
+`grid-column-end` are "excluse/excludent". If we need to access from 1 `grid-column-start` to 3 `grid-column-end` we need to add 1 and define `grid-column-end`to 4
+
+When pairing grid-column-start and grid-column-end, you might assume that the end value has to be greater than the start value. But this turns out not the case! We could do the inverse, starting from 5 and ending at 2, for example.
+
+If you want to count grid lines from the right instead of the left, you can give `grid-column-start`and `grid-column-end` negative values. For example, you can set it to -1 to specify the first grid line from the right.
+
+Instead of defining a grid item based on the start and end positions of the grid lines, you can define it based on your desired column width using the span keyword. Keep in mind that span only works with positive values.
+
+You can also use the `span` keyword with `grid-column-start` to set your item's width relative to the end position.
+
+Typing both `grid-column-start` and `grid-column-end` every time can get tiring. Fortunately, `grid-column` is a shorthand property that can accept both values at once, separated by a slash.
+
+For example, `grid-column`: 2 / 4; will set the grid item to start on the 2nd vertical grid line and end on the 4th grid line.
+
+One of the things that sets CSS grids apart from flexbox is that you can easily position items in two dimensions: columns and rows. `grid-row-start` works much like `grid-column-start` except along the vertical axis.
+
+ou can also use `grid-column` and `grid-row` together to `span` larger areas within the grid like
+```css
+{
+    grid-column: 2/6;
+    grid-row: 1/6;
+}
+```
+If typing out both `grid-column` and `grid-row` is too much for you, there's yet another shorthand for that. `grid-area` accepts four values separated by slashes: `grid-row-start`, `grid-column-start`, `grid-row-end`, followed by `grid-column-end`.
+Example:
+```css
+{
+    grid-area: 1/2/4/6;
+}
+```
+
+If grid items aren't explicitly placed with grid-area, grid-column, grid-row, etc., they are automatically placed according to their order in the source code. We can override this using the order property, which is one of the advantages of grid over table-based layout.
+
+By default, all grid items have an order of 0, but this can be set to any positive or negative value, similar to z-index.
