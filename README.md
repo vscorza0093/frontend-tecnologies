@@ -1,4 +1,4 @@
-# Front End Tecnologies
+# Frontend Tecnologies
 
 * http protocol, html, css and everything related to web and front-end
 
