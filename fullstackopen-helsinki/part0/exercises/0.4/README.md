@@ -1,8 +1,7 @@
 ## Resolution: 
 
-```mermaid
-
 requesting change in html page
+```mermaid
 ---
 Helsinki Fullstack Open - part 0 exercise 4
 new_note
