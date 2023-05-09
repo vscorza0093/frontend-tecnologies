@@ -8,13 +8,24 @@
     <title>Base Document</title>
 </head>
     <body>
+        <script>
+            alert('JS is very crazy')
+        </script>
         <div id="div-header">
             <h1>ultima</h1>
             <ul>
-                <li><a href="#">Cursos</a></li>
+                <li><a id="button" href="#">Cursos</a></li>
                 <li><a href="#">Estude de graça</a></li>
                 <li><a class="login" href="#">Login</a></li>
             </ul>
         </div>
+        <script>
+            var button = document.getElementById('button')
+            function changeButtonName(event){
+                event.preventDefault()
+                button.innerText = 'Cursos - Alterado'
+            }
+            button.onclick = changeButtonName
+        </script>
     </body>
 </html>
