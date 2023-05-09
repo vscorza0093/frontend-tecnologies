@@ -1,57 +1,71 @@
-# 0.4: Novo diagrama das notas
+## Resolution: 
 
-Na seção Carregando uma página contendo JavaScript — revisão[1], a cadeia de eventos causada pela abertura da página https://studies.cs.helsinki.fi/exampleapp/notes é retratada como um diagrama de sequência[2].
+```mermaid
+---
+Helsinki Fullstack Open - part 0 exercise 4
+---
+flowchart TD
+    A[Browser] -->|POST| B(Request URL)
+    B[Server] --> C{Status Code}
+    C -->|Found| D[302]
+    D -->|content-type| E[text/html]
+    E --> A
+```
 
-O diagrama foi feito como um arquivo GitHub Markdown usando a sintaxe Mermaid[3], como o exemplo a seguir:
+Rascunho
 
-sequenceDiagram
-    participant browser
-    participant server
+    new_note
+        General
+            Request URL: https://studies.cs.helsinki.fi/exampleapp/new_note
+            Request Method: POST
+            Status Code: 302 
 
-    browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/notes
-    activate server
-    server-->>browser: HTML document
-    deactivate server
 
-    browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/main.css
-    activate server
-    server-->>browser: the css file
-    deactivate server
+        Response Header
+            content-type: text/html; charset=utf-8
 
-    browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/main.js
-    activate server
-    server-->>browser: the JavaScript file
-    deactivate server
+    notes
+        General
+            Request URL: https://studies.cs.helsinki.fi/exampleapp/notes
+            Request Method: GET
+            Status Code: 200 
 
-    Note right of browser: O navegador começa a executar o código JavaScript que busca o JSON do servidor
+        Response Header
+            content-type: text/html; charset=utf-8
 
-    browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/data.json
-    activate server
-    server-->>browser: [{ "content": "HTML é fácil", "date": "2023-1-1" }, ... ]
-    deactivate server
+    main.css
+        General
+            Request URL: https://studies.cs.helsinki.fi/exampleapp/main.css
+            Request Method: GET
+            Status Code: 200 
 
-    Note right of browser: O navegador executa a função callback (função de retorno de chamada) que renderiza as notas
 
-Crie um diagrama semelhante que retrate a situação em que o usuário cria uma nova nota na página https://studies.cs.helsinki.fi/exampleapp/notes escrevendo algo no campo de texto e clicando no botão submit.
+        Response Header
+            content-type: text/css; charset=UTF-8
 
-Se necessário, mostre operações no navegador ou no servidor como comentários no diagrama.
 
-O diagrama não precisa ser um diagrama de sequência. Qualquer maneira sensata de representar os eventos já estará de bom tamanho.
+    main.js
+        General
+            Request URL: https://studies.cs.helsinki.fi/exampleapp/main.js
+            Request Method: GET
+            Status Code: 200 
 
-Todas as informações necessárias para fazer este e os próximos dois exercícios podem ser encontradas no texto desta parte[4]. A ideia desses exercícios é fazer você reler o texto e pensar no que está acontecendo. Não é necessário ler o código[5] da aplicação, mas não deixa de ser algo possível.
+        
+        Response Header
+            content-type: application/javascript; charset=UTF-8
 
-Você pode fazer os diagramas com qualquer programa, mas talvez a maneira mais fácil e melhor de se fazer diagramas seja utilizando a sintaxe Mermaid[6], agora implementada em páginas Markdown do GitHub[7]!
 
-[1] https://fullstackopen.com/ptbr/part0/fundamentos_de_aplicacoes_web#carregando-uma-pagina-contendo-java-script-revisao
+    data.json
+        General
+            Request URL: https://studies.cs.helsinki.fi/exampleapp/data.json
+            Request Method: GET
+            Status Code: 200 
 
-[2] https://www.geeksforgeeks.org/unified-modeling-language-uml-sequence-diagrams/
 
-[3] https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-diagrams
+        Response Header
+            content-type: application/json; charset=utf-8
 
-[4] https://fullstackopen.com/ptbr/part0/fundamentos_de_aplicacoes_web#formularios-forms-e-http-post
 
-[5] https://github.com/mluukkai/example_app
 
-[6] https://github.com/mermaid-js/mermaid#sequence-diagram-docs---live-editor
 
-[7] https://github.blog/2022-02-14-include-diagrams-markdown-files-mermaid/
+        {"content":"ascariasisband","date":"2023-05-09T21:20:01.893Z"}
