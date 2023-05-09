@@ -3,17 +3,74 @@
 ```mermaid
 ---
 Helsinki Fullstack Open - part 0 exercise 4
+new_note
 ---
 flowchart TD
-    A[Browser] -->|POST| B(Request URL)
-    B[Server] --> C{Status Code}
-    C -->|Found| D[302]
-    D -->|content-type| E[text/html]
-    E --> A
+    A[Browser] --> B{POST}
+    B --> |open server connection| C
+    C[Server] --> D{Status Code}
+    D -->|close server connection| E[302]
+    E -->|content-type| F[text/html]
+    F --> A
+```
+
+```mermaid
+---
+Helsinki Fullstack Open - part 0 exercise 4
+note
+---
+flowchart TD
+    A[Browser] --> B{GET}
+    B --> |open server connection| C
+    C[Server] --> D{Status Code}
+    D -->|close server connection| E[200] 
+    E -->|content-type| F[text/html]
+    F --> A
+```
+
+```mermaid
+---
+Helsinki Fullstack Open - part 0 exercise 4
+main.css
+---
+flowchart TD
+    A[Browser] --> B{GET}
+    B --> |open server connection| C
+    C[Server] --> D{Status Code}
+    D -->|close server connection| E[200]
+    E -->|content-type| F[text/css]
+    F --> A
+```
+
+```mermaid
+---
+Helsinki Fullstack Open - part 0 exercise 4
+main.js
+---
+flowchart TD
+    A[Browser] --> B{GET}
+    B --> |open server connection| C
+    C[Server] --> D{Status Code}
+    D -->|close server connection| E[200]
+    E --> F{content type}
+    F --> |application/javascript| A
+```
+
+```mermaid
+---
+Helsinki Fullstack Open - part 0 exercise 4
+data.json
+---
+flowchart TD
+    A[Browser] --> B{GET}
+    B --> |open server connection| C
+    C[Server] --> D{Status Code}
+    D -->|close server connection| E[200]
+    E --> F{content type}
+    F --> |application/json| A
 ```
 
 Rascunho
-
     new_note
         General
             Request URL: https://studies.cs.helsinki.fi/exampleapp/new_note
