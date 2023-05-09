@@ -1,6 +1,8 @@
 ## Resolution: 
 
 ```mermaid
+
+requesting change in html page
 ---
 Helsinki Fullstack Open - part 0 exercise 4
 new_note
@@ -14,6 +16,7 @@ flowchart TD
     F --> A
 ```
 
+requesting html page
 ```mermaid
 ---
 Helsinki Fullstack Open - part 0 exercise 4
@@ -28,6 +31,7 @@ flowchart TD
     F --> A
 ```
 
+requesting css file
 ```mermaid
 ---
 Helsinki Fullstack Open - part 0 exercise 4
@@ -42,6 +46,7 @@ flowchart TD
     F --> A
 ```
 
+requesting javascript file
 ```mermaid
 ---
 Helsinki Fullstack Open - part 0 exercise 4
@@ -56,6 +61,7 @@ flowchart TD
     F --> |application/javascript| A
 ```
 
+requesting json file
 ```mermaid
 ---
 Helsinki Fullstack Open - part 0 exercise 4
