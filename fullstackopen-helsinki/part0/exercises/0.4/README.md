@@ -7,9 +7,9 @@ Helsinki Fullstack Open - part 0 exercise 4
 new_note
 ---
 flowchart TD
-    A[Browser] --> B{POST}
+    A[Client-Side] --> B{POST}
     B --> |open server connection| C
-    C[Server] --> D{Status Code}
+    C[Server-Side] --> D{Status Code}
     D -->|close server connection| E[302]
     E -->|content-type| F[text/html]
     F --> A
@@ -22,9 +22,9 @@ Helsinki Fullstack Open - part 0 exercise 4
 note
 ---
 flowchart TD
-    A[Browser] --> B{GET}
+    A[Client-Side] --> B{GET}
     B --> |open server connection| C
-    C[Server] --> D{Status Code}
+    C[Server-Side] --> D{Status Code}
     D -->|close server connection| E[200] 
     E -->|content-type| F[text/html]
     F --> A
@@ -37,9 +37,9 @@ Helsinki Fullstack Open - part 0 exercise 4
 main.css
 ---
 flowchart TD
-    A[Browser] --> B{GET}
+    A[Client-Side] --> B{GET}
     B --> |open server connection| C
-    C[Server] --> D{Status Code}
+    C[Server-Side] --> D{Status Code}
     D -->|close server connection| E[200]
     E -->|content-type| F[text/css]
     F --> A
@@ -52,9 +52,9 @@ Helsinki Fullstack Open - part 0 exercise 4
 main.js
 ---
 flowchart TD
-    A[Browser] --> B{GET}
+    A[Client-Side] --> B{GET}
     B --> |open server connection| C
-    C[Server] --> D{Status Code}
+    C[Server-Side] --> D{Status Code}
     D -->|close server connection| E[200]
     E --> F{content type}
     F --> |application/javascript| A
@@ -67,9 +67,9 @@ Helsinki Fullstack Open - part 0 exercise 4
 data.json
 ---
 flowchart TD
-    A[Browser] --> B{GET}
+    A[Client-Side] --> B{GET}
     B --> |open server connection| C
-    C[Server] --> D{Status Code}
+    C[Server-Side] --> D{Status Code}
     D -->|close server connection| E[200]
     E --> F{content type}
     F --> |application/json| A
