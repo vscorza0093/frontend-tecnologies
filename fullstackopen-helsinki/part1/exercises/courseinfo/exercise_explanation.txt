@@ -1,0 +1,73 @@
+A aplicação que começaremos a trabalhar neste exercício será desenvolvida em alguns dos exercícios seguintes. Neste e em outros conjuntos de exercícios futuros neste curso, é suficiente enviar apenas o estado final da aplicação. Se desejar, também pode criar um commit para cada exercício da série, mas é algo totalmente opcional.
+
+
+
+Use "create-react-app" para inicializar uma nova aplicação. Modifique o arquivo index.js para que fique desta forma:
+
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+
+import App from './App'
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />)
+
+E App.js para:
+
+const App = () => {
+  const course = 'Desenvolvimento de aplicação Half Stack'
+  const part1 = 'Fundamentos da biblioteca React'
+  const exercises1 = 10
+  const part2 = 'Usando props para passar dados'
+  const exercises2 = 7
+  const part3 = 'Estado de um componente'
+  const exercises3 = 14
+
+  return (
+    <div>
+      <h1>{course}</h1>
+      <p>
+        {part1} {exercises1}
+      </p>
+      <p>
+        {part2} {exercises2}
+      </p>
+      <p>
+        {part3} {exercises3}
+      </p>
+      <p>Number of exercises {exercises1 + exercises2 + exercises3}</p>
+    </div>
+  )
+}
+
+export default App
+
+
+E remova arquivos extras (App.css, App.test.js, index.css, logo.svg, setupTests.js, reportWebVitals.js).
+
+Infelizmente, toda a aplicação está no mesmo componente. Refatore o código para que consista em três novos componentes: Header, Content e Total. Todos os dados ainda residem no componente App, que passa os dados necessários a cada componente usando props. Header cuida da renderização do nome do curso, Content renderiza as partes e o número de exercícios e Total renderiza o número total de exercícios.
+
+Defina os novos componentes no arquivo App.js.
+
+O corpo do componente App ficará desta forma:
+
+const App = () => {
+  // definições "const"
+
+  return (
+    <div>
+      <Header course={course} />
+      <Content ... />
+      <Total ... />
+    </div>
+  )
+}
+
+ATENÇÃO I: Não tente programar todos os componentes simultaneamente, pois isso quase que certamente fará com que a aplicação desmorone. Avance em pequenos passos. Programe primeiro o componente Header, por exemplo, e somente quando estiver funcionando corretamente, prossiga para o próximo componente.
+
+O progresso cuidadoso e que avança em pequenos passos pode parecer lento, porém, na verdade, é de longe o caminho mais rápido para o progresso. O famoso desenvolvedor de software Robert "Uncle Bob" Martin afirmou:
+
+"A única maneira de ir rápido é ir bem."
+
+Ou seja, de acordo com Martin, o progresso cuidadoso, passo a passo, é, ainda, a única maneira de ir rápido.
+
+ATENÇÃO II "create-react-app" faz automaticamente com que o projeto se torne um repositório git, a menos que a aplicação seja criada dentro de um repositório já existente. É muito provável que você não queira que o projeto se torne um repositório, então execute o comando rm -rf .git na raiz do projeto.

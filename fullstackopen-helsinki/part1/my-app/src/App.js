@@ -1,4 +1,3 @@
-/*
 const js = "JavaScript"
 
 const ReactApp = () => {
@@ -32,16 +31,16 @@ const FckingCrazyness = (props) => {
     <div>
       <h3>Look!</h3>
       <p>I'm creating {props.jsx} components and calling them from other functions like {props.html} components and compiling in {props.js}</p>
-      <AndNow />
+      <AndNow ctrl="&#127918;"/>
     </div>
   )
 }
 
-const AndNow = () => {
+const AndNow = (props) => {
   console.log("Função 4 -> " + AndNow.name)
   return (
   <div>
-    <h2>IN ENGLISH AND WITH EMOJIS &#127918;</h2>
+    <h2>IN ENGLISH AND WITH EMOJIS {props.ctrl}</h2>
     <p>.</p>
     <p>.</p>
     <p>.</p>
@@ -62,8 +61,7 @@ const Finito = (props) => {
       <p style={{fontSize:5}}>eu gostei disso, obrigado {props.react}</p>
     </div>
 )}
-*/
-
+/*
 const ReactApp = () => {
   const games = [
     { name: 'Doom 2', type: 'FPS'},
@@ -80,5 +78,5 @@ const ReactApp = () => {
     </div>
   )
 }
-
+*/
 export default ReactApp
