@@ -1,0 +1,15 @@
+1.2: course information — 2º passo
+
+Refatore o componente Content de tal forma que ele não renderize os nomes das partes ou seus números de exercícios por si mesmo. Em vez disso, somente renderiza três componentes Part, cada um dos quais renderiza o nome e o número de exercícios de uma parte.
+
+const Content = ... {
+  return (
+    <div>
+      <Part .../>
+      <Part .../>
+      <Part .../>
+    </div>
+  )
+}
+
+No momento, nossa aplicação passa informações de uma maneira bastante primitiva, já que está baseada em variáveis individuais. Vamos corrigir isso na Parte 2.
