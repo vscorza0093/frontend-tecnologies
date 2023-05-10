@@ -1,7 +1,5 @@
 # Frontend Tecnologies
 
-_I promise to keep the console open all the time during this course, and for the rest of my life when I'm doing web development_
-
 * http protocol, html, css and everything related to web and front-end
 
 ## A Bit of History
