@@ -1,7 +1,5 @@
+/*
 const js = "JavaScript"
-const jsx = "JSX"
-const react = "React"
-const html = "HTML"
 
 const ReactApp = () => {
   console.log("Função 1 -> " + ReactApp.name)
@@ -23,17 +21,17 @@ const Crazyness = (props) => {
       <p>
         Essa coisa de {props.js} e {props.jsx}, {props.react}... loucura
       </p>
-      <FckingCrazyness />
+      <FckingCrazyness js='JavaScript' jsx='JSX' html='HTML'/>
     </div>
   )
 }
 
-const FckingCrazyness = () => {
+const FckingCrazyness = (props) => {
   console.log("Função 3 -> " + FckingCrazyness.name)
   return (
     <div>
       <h3>Look!</h3>
-      <p>I'm creating {jsx} components and calling them from other functions like {html} components and compiling in {js}</p>
+      <p>I'm creating {props.jsx} components and calling them from other functions like {props.html} components and compiling in {props.js}</p>
       <AndNow />
     </div>
   )
@@ -50,19 +48,37 @@ const AndNow = () => {
     <p>.</p>
     <p>.</p>
     <p>.</p>
-    <Finito />
+    <Finito react='React'/>
   </div>
 )}
 
-const Finito = () => {
+const Finito = (props) => {
   console.log("Função 5 -> " + Finito.name)
   return (
     <div>
       <h1>
         Finito.
       </h1>
-      <p style={{fontSize:5}}>eu gostei disso</p>
+      <p style={{fontSize:5}}>eu gostei disso, obrigado {props.react}</p>
     </div>
 )}
+*/
+
+const ReactApp = () => {
+  const games = [
+    { name: 'Doom 2', type: 'FPS'},
+    { name: 'Diablo 2', type: 'Action RPG'},
+  ]
+
+  return (
+    <div>
+      <h1>Greate games</h1>
+      <br></br>
+      <h2>{games[0].name}</h2>
+      <h2>{games[1].name}</h2>
+
+    </div>
+  )
+}
 
 export default ReactApp

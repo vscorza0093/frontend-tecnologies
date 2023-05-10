@@ -154,6 +154,143 @@ Essa coisa de {props.js} e {props.jsx}, {props.react}... loucura
 </p>
 ```
 
+tenha em mente que os nomes de componentes React devem estar com a primeira letra em maiúsculo. Se você tentar definir um componente da seguinte forma:
+
+const footer = () => {
+  return (
+    <div>
+      Aplicação de Saudações criado por <a href='https://github.com/mluukkai'>mluukkai</a>
+    </div>
+  )
+}
+E usá-lo desta forma:
+
+const App = () => {
+  return (
+    <div>
+      <h1>Olá a todos!</h1>
+      <Hello nome='Maya' idade={26 + 10} />
+      <footer />
+    </div>
+  )
+}
+A página não vai exibir o conteúdo definido dentro do componente Footer e, em vez disso, React cria apenas um elemento footer vazio, ou seja, o elemento HTML incorporado em vez do elemento React personalizado com o mesmo nome. Se você mudar a primeira letra do nome do componente para maiúsculo, o React cria um elemento div definido no componente Footer, que é renderizado na página.
+
+Note que o conteúdo de um componente React (normalmente) precisa conter um elemento raiz (root). Se, por exemplo, tentarmos definir o componente App sem o elemento div externo:
+```js
+const App = () => {
+  return (
+    <h1>Olá a todos!</h1>
+    <Hello nome='Maya' idade={26 + 10} />
+    <Footer />
+  )
+}
+```
+o resultado é uma mensagem de erro. 
+
+_(IMG error1.png)_
+
+```js
+const App = () => {
+  return [
+    <h1>Olá a todos!</h1>,
+    <Hello nome='Maya' idade={26 + 10} />,
+    <Footer />
+  ]
+}
+```
+
+Porém, definir o componente raiz da aplicação não é algo particularmente sábio a se fazer, e deixa o código com uma aparência um pouco feia.
+
+Por conta do elemento raiz ser compulsório, temos elementos div "extras" na árvore DOM. Isso pode ser evitado usando fragmentos, ou seja, envolvendo os elementos a serem retornados pelo componente com um elemento vazio:
+```js
+const App = () => {
+  const nome = 'Peter'
+  const idade = 10
+
+  return (
+    <>
+      <h1>Olá a todos!</h1>
+      <Hello nome='Maya' idade={26 + 10} />
+      <Hello nome={nome} idade={idade} />
+      <Footer />
+    </>
+  )
+}
+```
+* Agora, a aplicação compila com sucesso, e a DOM gerada pelo React não contém mais o elemento `div` extra.
+
+
+### Não renderize objetos
+
+Considere uma aplicação que imprime os nomes e idades de nossos amigos na tela:
+```js
+const App = () => {
+  const amigos = [ 
+      { nome: 'Peter', idade: 4 },
+      { nome: 'Maya', idade: 10 },
+    ]
+
+  return (
+    <div>
+      <p>{amigos[0]}</p>
+      <p>{amigos[1]}</p>
+    </div>
+  )
+}
+
+export default App
+```
+
+No entanto, nada aparece na tela e o console grita em vermelho.
+*Objects are not valid as a React child*
+
+O núcleo do problema é que: Objetos não são válidos como elementos-filho React, isto é, a aplicação tenta renderizar objetos e falha novamente.
+
+O código tenta renderizar as informações de um amigo da seguinte maneira:
+```jsx
+<p>{amigos[0]}</p>
+```
+
+E isso causa um problema, porque o item a ser renderizado dentro das chaves é um objeto.
+```jsx
+{ nome: 'Peter', idade: 4 }
+```
+
+Em React, elementos individuais renderizadas dentro das chaves devem ser valores primitivos, como números ou strings.
+
+A solução é a seguinte:
+```jsx
+const App = () => {
+  const amigos = [ 
+      { nome: 'Peter', idade: 4 },
+      { nome: 'Maya', idade: 10 },
+    ]
+
+  return (
+    <div>
+      <p>{amigos[0].nome} {amigos[0].idade}</p>
+      <p>{amigos[1].nome} {amigos[1].idade}</p>
+    </div>
+  )
+}
+
+export default App
+```
+O nome do amigo é renderizado separadamente dentro das chaves
+
+Uma adição ao lembrete anterior: React também permite que arrays sejam renderizados se contiverem valores elegíveis para renderização (como números ou strings). Então, o seguinte programa funcionaria, embora o resultado não seja o que desejamos:
+```jsx
+const App = () => {
+  const amigos = [ 'Peter', 'Maya']
+
+  return (
+    <div>
+      <p>{amigos}</p>
+    </div>
+  )
+}
+```
 
 
 
