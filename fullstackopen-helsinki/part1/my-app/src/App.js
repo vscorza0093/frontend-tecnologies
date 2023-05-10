@@ -1,22 +1,27 @@
+const js = "JavaScript"
+const jsx = "JSX"
+const react = "React"
+const html = "HTML"
+
 const ReactApp = () => {
   console.log("Função 1 -> " + ReactApp.name)
   return (
     <div>
-      <h1>Olá, JavaScript!</h1>
+      <h1>Olá, {js}</h1>
       <p>Eu sempre te odiei...</p>
       <p>Quem sabe agora eu não mudo de ideia?</p>
-      <Crazyness />
+      <Crazyness js='JavaScript' jsx='JSX' react='React'/>
     </div>
   )
 }
 
-const Crazyness = () => {
+const Crazyness = (props) => {
   console.log("Função 2 -> " + Crazyness.name)
   return (
     <div>
       <h2>É bem provável</h2>
       <p>
-        Essa coisa de JavaScript e JSX, React... loucura
+        Essa coisa de {props.js} e {props.jsx}, {props.react}... loucura
       </p>
       <FckingCrazyness />
     </div>
@@ -28,7 +33,7 @@ const FckingCrazyness = () => {
   return (
     <div>
       <h3>Look!</h3>
-      <p>I'm creating JSX components and calling them from other functions like html components</p>
+      <p>I'm creating {jsx} components and calling them from other functions like {html} components and compiling in {js}</p>
       <AndNow />
     </div>
   )
@@ -56,6 +61,7 @@ const Finito = () => {
       <h1>
         Finito.
       </h1>
+      <p style={{fontSize:5}}>eu gostei disso</p>
     </div>
 )}
 
