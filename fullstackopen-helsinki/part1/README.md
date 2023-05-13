@@ -416,11 +416,366 @@ objeto1['numero secreto'] = 12341
 ```
 * A última adição representada acima tem que ser feita usando colchetes porque, quando se usa a notação de ponto, numero secreto não é um nome de propriedade válido devido ao caractere de espaço separando as duas palavras.
 
+Objetos também podem ser definidos usando funções construtoras, o que resulta em um mecanismo semelhante a muitas outras linguagens de programação, como Java. Apesar desta semelhança, o JavaScript não tem classes tal qual outras linguagens de programação orientadas a objetos. No entanto, a partir da versão ES6, foi adicionada a sintaxe para classes, o que em alguns casos ajuda a estruturar classes orientadas a objetos.
+
+## Funções
+
+Funções podem adotar sintaxes bastante versáteis em JavaScript graças às arrow functions.
+
+Se uma arrow function possuir apenas um parâmetro, podemos excluir os parênteses, na hora de defini-la
+```js
+const quadrado = p => {
+  console.log(p)
+  return p * p
+}
+```
+Se a função contiver apenas uma expressão, então as chaves não são necessárias. Neste caso, a função retorna apenas o resultado de sua única expressão.
+```js
+const quadrado = p => 
+  return p * p
+```
+Mas podemos fazer uma maneira ainda mais sofisticada
+```js
+const quadrado = p => p * p
+```
+
+Este formato é particularmente útil ao manipular arrays, como quando usamos o método "map":
+```js
+const t = [1, 2, 3]
+const tAoQuadrado = t.map(p => p * p)
+// tAoQuadrado agora é [1, 4, 9]
+```
+A funcionalidade da arrow function foi adicionada ao JavaScript há apenas alguns anos, com a versão ES6. Antes disso, a única maneira de definir funções era usando a palavra-chave function.
+
+Existem duas maneiras de se referenciar uma função; uma é atribuir um nome em uma declaração de função (function declaration).
+```js
+function produto(a, b) {
+  return a * b
+}
+
+const resultado = produto(2, 6)
+// resultado agora é 12
+```
+Outra maneira de definir uma função é usando uma expressão de função (function expression). Neste caso, não é necessário atribuir um nome à função, e a definição pode residir dentro do restante do código:
+```js
+const media = function(a, b) { // *média
+  return (a + b) / 2
+}
+
+const resultado = media(2, 5)
+// resultado agora é 3.5
+```
+Durante este curso, todas as funções serão definidas usando a sintaxe de seta.
 
 
+## Métodos de objetos e "this"
+
+Como este curso usa uma versão de React que contém React Hooks, não é necessário definir objetos com métodos. O conteúdo deste capítulo não é relevante para o curso, mas certamente é bom conhecer. Em particular, ao usar versões antigas de React, é necessário compreender os tópicos deste capítulo.
+
+Arrow functions e funções definidas usando a palavra-chave function variam substancialmente em relação ao comportamento da palavra-chave this, que se refere ao próprio objeto.
+
+Podemos atribuir métodos a um objeto definindo propriedades que são funções:
+```js
+const arto = {
+  nome: 'Arto Hellas',
+  idade: 35,
+  educacao: 'PhD', // *educação
+  cumprimentar: function() { // *saudação
+    console.log('olá, meu nome é ' + this.nome)
+  },
+}
+
+arto.cumprimentar()  // "olá, meu nome é Arto Hellas" é impresso
+```
+Métodos podem ser atribuídos a objetos mesmo após a criação do objeto:
+```js
+const arto = {
+  nome: 'Arto Hellas',
+  idade: 35,
+  educacao: 'PhD',
+  cumprimentar: function() {
+    console.log('olá, meu nome é ' + this.nome)
+  },
+}
+
+arto.envelhecer = function() {
+  this.idade += 1
+}
+
+console.log(arto.idade)   // 35 é impresso
+arto.envelhecer()
+console.log(arto.idade)   // 36 é impresso
+```
+Vamos modificar um pouco o objeto:
+```js
+const arto = {
+  nome: 'Arto Hellas',
+  idade: 35,
+  educacao: 'PhD',
+  cumprimentar: function() {
+    console.log('olá, meu nome é ' + this.nome)
+  },
+  fazerAdicao: function(a, b) { // *fazerAdição
+    console.log(a + b)
+  },
+}
+
+arto.fazerAdicao(1, 4)        // 5 é impresso
+
+const referenciaParaAdicao = arto.fazerAdicao
+referenciaParaAdicao(10, 15)   // 25 é impresso
+```
+Agora, o objeto tem o método fazerAdicao, que calcula a soma dos números dados a ele como parâmetros. O método é chamado da maneira tradicional, usando o objeto arto.fazerAdicao(1, 4) ou armazenando uma referência ao método em uma variável e chamando o método através da variável: referenciaParaAdicao(10, 15).
+
+Se tentarmos fazer o mesmo com o método cumprimentar, deparamo-nos com um problema:
+```js
+arto.cumprimentar()       // "olá, meu nome é Arto Hellas" é impresso
+
+const referenciaParaCumprimentar = arto.cumprimentar
+referenciaParCumprimentar() // "olá, meu nome é undefined" é impresso
+```
+
+Ao chamar o método através de uma referência, o método perde o conhecimento do que era o this original. Ao contrário de outras linguagens, em JavaScript, o valor de this é definido com base em como o método é chamado. Ao chamar o método através de uma referência, o valor de this se torna o chamado objeto global (global object) e o resultado final sai geralmente diferente do que o desenvolvedor originalmente pretendeu.
+
+Perder o rastro do this ao escrever código JavaScript traz alguns problemas eventuais. Algumas situações frequentemente surgem onde React ou o Node (ou mais especificamente o motor JavaScript do navegador) precisa chamar algum método em um objeto que o desenvolvedor tenha definido. No entanto, neste curso, evitamos esses problemas usando o JavaScript "sem this".
+
+Uma situação que leva ao "desaparecimento" do this ocorre quando definimos um tempo limite para chamar a função cumprimentar no objeto arto, usando a função setTimeout.
+```js
+const arto = {
+  nome: 'Arto Hellas',
+  cumprimentar: function() {
+    console.log('olá, meu nome é ' + this.nome)
+  },
+}
+
+setTimeout(arto.cumprimentar, 1000)
+```
+Como mencionado, o valor de this em JavaScript é definido com base na forma como o método é chamado. Quando o setTimeout está chamando o método, é o motor JavaScript que realmente chama o método e, nesse ponto, this se refere ao objeto global.
+
+Existem vários mecanismos pelos quais o this original pode ser preservado. Um desses é usando um método chamado bind (significa amarrar ou atar):
+```js
+setTimeout(arto.cumprimentar.bind(arto), 1000)
+```
+Chamar arto.cumprimentar.bind(arto) cria uma nova função onde this é obrigado a apontar para Arto, independentemente de onde e como o método está sendo chamado.
+
+Usando Arrow functions é possível resolver alguns dos problemas relacionados ao this. No entanto, eles não devem ser usados como métodos para objetos, pois o this não funciona de forma alguma. Mais tarde, voltaremos a discutir o comportamento da palavra-chave this em relação às arrow functions.
+
+Se deseja compreender de fato como this funciona em JavaScript, a Internet está cheia de material sobre o assunto como, por exemplo, a série screencast Understand JavaScript's this Keyword in Depth por egghead.io, que é extremamente recomendada!
 
 
+## Classes
 
+Como mencionado anteriormente, não há um "mecanismo" de classes em JavaScript como os de linguagens de programação orientadas a objetos. No entanto, há funcionalidades para tornar possível a "simulação" de classes orientadas a objetos.
+
+Vamos dar uma olhada na sintaxe para classes que foi introduzida ao JavaScript com o ES6, o que simplifica substancialmente a definição de classes (ou estruturas semelhantes a classes) em JavaScript.
+
+No exemplo a seguir, definimos uma "classe" chamada Pessoa e dois objetos Pessoa:
+```js
+class Pessoa {
+  constructor(nome, idade) {
+    this.nome = nome
+    this.idade = idade
+  }
+  cumprimentar() {
+    console.log('olá, meu nome é ' + this.nome)
+  }
+}
+
+const adam = new Pessoa('Adam Ondra', 29)
+adam.cumprimentar()
+
+const janja = new Pessoa('Janja Garnbret', 23)
+janja.cumprimentar()
+```
+
+Quanto à sintaxe, as classes e os objetos criados a partir delas são muito semelhantes às classes e objetos Java. Seu comportamento também é bastante semelhante aos objetos Java. Mas em seu mecanismo interno, ainda são objetos baseados na herança prototipal [9] de JavaScript. O tipo de ambos os objetos é, na verdade, Object, uma vez que o JavaScript essencialmente define apenas os tipos Boolean, Null, Undefined, Number, String, Symbol, BigInt e Object.
+
+A inserção da sintaxe para classes foi uma adição controversa. Confira Not Awesome: ES6 Classes [10] ou Is “Class” In ES6 The New “Bad” Part? on Medium [11] para mais detalhes.
+
+A sintaxe para classe ES6 é muito utilizada no "antigo" React e também no Node.js, portanto, é benéfico ter compreensão dela mesmo neste curso. Entretanto, como estaremos usando a nova funcionalidade Hooks do React ao longo deste curso, não teremos uso concreto da sintaxe para classes de JavaScript.
+
+
+## Materiais de JavaScript
+
+Existem guias bons e ruins para JavaScript na Internet. A maioria dos links nesta página relacionados às funcionalidades de JavaScript referem-se ao Guia JavaScript da Mozilla.
+
+É recomendado ler imediatamente o artigo A re-introduction to JavaScript (JS tutorial) [12] no site da Mozilla .
+
+Se deseja conhecer profundamente JavaScript, há uma ótima série de livros gratuitos na Internet chamada You-Dont-Know-JS [13].
+
+Outra ótima fonte para aprender JavaScript é javascript.info.
+
+O extremamente cativante e gratuito Eloquent JavaScript [14] te leva rapidamente dos conceitos básicos à construção de aplicações muito interessantes. É uma mistura de teoria, projetos e exercícios, e cobre tanto a teoria geral de programação quanto a linguagem JavaScript.
+
+egghead.io possui muitos screencasts de qualidade sobre JavaScript, React e outros tópicos interessantes. Infelizmente, alguns dos materiais só são acessíveis na versão paga.
+
+
+## Funções auxiliares de componentes
+
+Vamos expandir nosso componente Hello para que ele adivinhe o ano de nascimento da pessoa que está sendo saudada:
+```js
+const Hello = (props) => {
+  const anoDeNascimento = () => {
+    const anoDeHoje = new Date().getFullYear()
+    return anoDeHoje - props.idade
+  }
+
+  return (
+    <div>
+      <p>
+        Olá {props.nome}, você tem {props.idade} anos.
+      </p>
+      <p>Então, você nasceu provavelmente em {anoDeNascimento()}.</p>
+    </div>
+  )
+}
+```
+A lógica para achar o ano de nascimento é separada em uma função que é chamada quando o componente é renderizado.
+
+A idade da pessoa não precisa ser passada como parâmetro para a função, já que ela pode acessar diretamente todas as propriedades que são passadas para o componente.
+
+Se examinarmos nosso código atual de perto, vamos perceber que a função "auxiliadora" é definida dentro de outra função que define o comportamento de nosso componente. Em Java, definir uma função dentro de outra é algo complexo e incômodo, portanto, não é algo muito comum. Em JavaScript, entretanto, definir funções dentro de funções é uma técnica amplamente usada.
+
+
+## Desestruturação (Destructuring)
+
+Antes de avançarmos, vamos dar uma olhada em uma pequena, porém útil, funcionalidade da linguagem JavaScript que foi adicionada na especificação ES6, que nos permite desestruturar (destructuring assignment [atribuição via desestruturação]) valores de objetos e arrays por atribuição.
+
+Em nosso código anterior, tivemos que referenciar os dados passados para nosso componente como props.nome e props.idade. Dessas duas expressões, tivemos que repetir props.idade duas vezes em nosso código.
+
+Já que props é um objeto...
+```js
+props = {
+  nome: 'Arto Hellas',
+  idade: 35,
+}
+```
+... podemos simplificar nosso componente atribuindo os valores das propriedades diretamente em duas variáveis nome e idade que podemos utilizar em nosso código:
+```js
+const Hello = (props) => {
+  const nome = props.nome
+  const idade = props.idade
+
+  const anoDeNascimento = () => new Date().getFullYear() - idade
+
+  return (
+    <div>
+      <p>Olá {nome}, você tem {idade} anos</p>
+      <p>Então, você nasceu provavelmente em {anoDeNascimento()}.</p>
+    </div>
+  )
+}
+```
+
+A desestruturação torna a atribuição de variáveis ainda mais fácil, já que podemos usá-la para extrair e reunir os valores das propriedades de um objeto em variáveis separadas:
+```js
+const Hello = (props) => {
+  const { nome, idade } = props
+  const anoDeNascimento = () => new Date().getFullYear() - idade
+
+  return (
+    <div>
+      <p>Olá {nome}, você tem {idade} anos.</p>
+      <p>Então, você provavelmente nasceu em {anoDeNascimento()}.</p>
+    </div>
+  )
+}
+```
+Se o objeto que estamos desestruturando tem os valores...
+```js
+props = {
+  nome: 'Arto Hellas',
+  idade: 35,
+}
+```
+... a expressão `const { nome, idade } = props` atribui os valores 'Arto Hellas' para nome e 35 para idade.
+
+Podemos levar a desestruturação um passo adiante:
+```js
+const Hello = ({ nome, idade }) => {
+  const anoDeNascimento = () => new Date().getFullYear() - idade
+
+  return (
+    <div>
+      <p>
+        Olá {nome}, você tem {idade} anos.
+      </p>
+      <p>Então, você provavelmente nasceu em {anoDeNascimento()}.</p>
+    </div>
+  )
+}
+```
+As props que são passadas para o componente agora são diretamente desestruturadas nas variáveis nome e idade.
+
+Isso significa que, em vez de atribuir o objeto props inteiro a uma variável chamada props e, em seguida, atribuir suas propriedades às variáveis nome e idade, nós atribuímos os valores das propriedades diretamente para variáveis ​​por meio da desestruturação do objeto props que é passado como parâmetro à função do componente:
+```js
+const Hello = ({ nome, idade }) => {}
+```
+
+## Re-renderização da página
+
+Até agora, todas as nossas aplicações foram escritas de tal forma que sua aparência permanece a mesma após a renderização inicial. E se quiséssemos criar um contador onde o valor aumentasse em função do tempo ou com um clique em um botão?
+
+Vamos começar com o seguinte. O arquivo App.js fica assim:
+```js
+const App = (props) => {
+  const {contador} = props
+  return (
+    <div>{contador}</div>
+  )
+}
+
+export default App
+```
+
+E o arquivo index.js fica desta forma:
+
+```js
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+
+import App from './App'
+
+let contador = 1
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <App contador={contador} />
+)
+```
+
+É dado ao componente "App" o valor do contador via a prop contador. Este componente renderiza o valor na tela. O que acontece quando o valor de contador muda? Mesmo se adicionarmos o seguinte...
+```js
+contador += 1
+```
+... o componente não será re-renderizado. Podemos fazer com que o componente seja re-renderizado chamando o método render uma segunda vez, por exemplo, da seguinte maneira:
+```js
+let contador = 1
+
+const recarregar = () => {
+  ReactDOM.createRoot(document.getElementById('root')).render(
+    <App contador={contador} />
+  )
+}
+
+recarregar()
+contador += 1
+recarregar()
+contador += 1
+recarregar()
+```
+
+O comando de re-renderização foi embalado dentro da função recarregar para diminuir a quantidade de código copiado e colado.
+
+Agora, o componente renderiza três vezes: primeiro com o valor 1; depois 2 e finalmente 3. Porém, os valores 1 e 2 são exibidos na tela por um período tão curto de tempo que não podem nem ser notados.
+
+Podemos implementar uma funcionalidade um pouco mais interessante re-renderizando e incrementando o contador a cada segundo usando setInterval ("definir intervalo"):
+```js
+setInterval(() => {
+  recarregar()
+  contador += 1
+}, 1000)
+```
+Fazer repetidas chamadas ao método render não é a forma recomendada de re-renderização de componentes.
 
 
 
@@ -432,3 +787,9 @@ objeto1['numero secreto'] = 12341
 [6] https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map
 [7] https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
 [8] https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Grammar_and_types#Object_literals
+[9] https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/Classes_in_JavaScript
+[10] https://github.com/petsel/not-awesome-es6-classes
+[11] https://rajaraodv.medium.com/is-class-in-es6-the-new-bad-part-6c4e6fe1ee65
+[12] https://developer.mozilla.org/en-US/docs/Web/JavaScript/Language_Overview
+[13] https://github.com/getify/You-Dont-Know-JS
+[14] https://eloquentjavascript.net/

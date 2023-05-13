@@ -1,0 +1,42 @@
+1.4: course information — 4º passo
+Agora, coloque os objetos em um array. Modifique as definições de variáveis do componente App da seguinte maneira e modifique igualmente as outras partes da aplicação:
+
+const App = () => {
+  const course = 'Desenvolvimento de aplicação Half Stack'
+  const parts = [
+    {
+      name: 'Fundamentos da biblioteca React',
+      exercises: 10
+    },
+    {
+      name: 'Usando props para passar dados',
+      exercises: 7
+    },
+    {
+      name: 'Estado de um componente',
+      exercises: 14
+    }
+  ]
+
+
+  return (
+    <div>
+      ...
+    </div>
+  )
+}
+Obs.: Neste ponto, presume-se que há sempre três itens, então não é necessário percorrer os arrays usando loops. Voltaremos ao tema de renderização de componentes com base em itens de arrays em uma abordagem minuciosa na próxima parte do curso.
+
+De qualquer forma, não passe objetos diferentes como propriedades separadas do componente App para os componentes Content e Total. Em vez disso, passe-os diretamente como um array:
+
+const App = () => {
+  // definições "const"
+
+  return (
+    <div>
+      <Header course={course} />
+      <Content parts={parts} />
+      <Total parts={parts} />
+    </div>
+  )
+}

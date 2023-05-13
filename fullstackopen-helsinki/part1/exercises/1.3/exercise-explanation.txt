@@ -1,0 +1,24 @@
+1.3: course information — 3º passo
+Vamos avançar para o uso de objetos em nossa aplicação. Modifique as definições de variáveis do componente App da forma a seguir e também refatore a aplicação para que continue funcionando:
+
+const App = () => {
+  const course = 'Desenvolvimento de aplicação Half Stack'
+  const part1 = {
+    name: 'Fundamentos da biblioteca React',
+    exercises: 10
+  }
+  const part2 = {
+    name: 'Usando props para passar dados',
+    exercises: 7
+  }
+  const part3 = {
+    name: 'Estado de um componente',
+    exercises: 14
+  }
+
+  return (
+    <div>
+      ...
+    </div>
+  )
+}

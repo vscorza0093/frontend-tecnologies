@@ -1,0 +1,28 @@
+1.5: course information — 5º passo
+Vamos dar um passo a frente com as mudanças. Transforme a constante "course" (curso) e suas "parts" (partes) em um único objeto JavaScript. Corrija tudo que venha a quebrar.
+
+const App = () => {
+  const course = {
+    name: 'Desenvolvimento de aplicação Half Stack',
+    parts: [
+      {
+        name: 'Fundamentos da biblioteca React',
+        exercises: 10
+      },
+      {
+        name: 'Usando props para passar dados',
+        exercises: 7
+      },
+      {
+        name: 'Estado de um componente',
+        exercises: 14
+      }
+    ]
+  }
+
+  return (
+    <div>
+      ...
+    </div>
+  )
+}
