@@ -777,6 +777,423 @@ setInterval(() => {
 ```
 Fazer repetidas chamadas ao método render não é a forma recomendada de re-renderização de componentes.
 
+## Componente "Stateful" (ou Componente com Estado)
+
+Todos os nossos componentes até agora foram simples no sentido de que não continham nenhum estado que pudesse mudar durante o ciclo de vida do componente.
+
+Então, vamos adicionar um "estado" ao componente App com a ajuda do state hook (Grosso modo, "gancho de estado", isto é, são funções que permitem a você “ligar-se” aos recursos de estado (state) e ciclo de vida do React a partir de componentes funcionais) do React.
+
+A aplicação será alterada da seguinte forma. O código de index.js retorna para:
+```js
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+
+import App from './App'
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />)
+```
+E o código de App.js muda para o seguinte:
+```js
+import { useState } from 'react'
+
+const App = () => {
+  const [ contador, setContador ] = useState(0)
+
+  setTimeout(
+    () => setContador(contador + 1),
+    1000
+  )
+
+  return (
+    <div>{contador}</div>
+  )
+}
+
+export default App
+```
+
+Na primeira linha, o arquivo importa a função useState
+O corpo da função que define o componente começa com a chamada da função:
+```js
+const [ contador, setContador ] = useState(0)
+```
+A chamada da função adiciona estado (state) ao componente e o renderiza inicializado com o valor 0 (zero). A função sempre retorna um array que contém dois itens. Atribuímos os itens às variáveis contador e setContador usando a sintaxe de atribuição via desestruturação mostrada anteriormente.
+
+A variável contador é atribuída ao valor inicial de estado, que é zero. A variável setContador é atribuída a uma função que será usada para modificar o estado.
+
+A aplicação chama a função setTimeout ("definir intervalo") e passa dois parâmetros: uma função para incrementar o estado do contador e um tempo de espera de 1000 milissegundos, que é o mesmo que 1 segundo:
+```js
+setTimeout(
+  () => setContador(contador + 1),
+  1000
+)
+```
+Artigo sobre State, o funcionamento do estado atual de um elemento numa página com código React https://react.dev/learn/state-a-components-memory
+
+Ótimo para entender um pouco mais sobre o State Hook.
+
+O useState Hook provém uma variável de estado que retém o valor entre as renderizações e uma função para setar um estado, que atualiza o valor da variável de estado e aciona o React para renderizar o componente de novo.
+
+Usar a sintaxe de desestruturação de array é ideal para armazenar os valores contidos em useState() já que a função sempre retornará um array de tamanho 2 (array[2])
+
+Uma função set funciona como `setSomething(nextState)` e deve estar dentro de algum event handler como setTimeout() ou handleClick para funcionar adequadamente. 
+A cada nova renderização, `setSomething(nextState)` irá agir, realizando a tarefa necessária.
+
+
+
+## Gerenciamento de eventos (Event handling)
+
+Na Parte 0, falamos rapidamente sobre os gerenciadores de eventos, que são registrados para serem chamados quando eventos específicos ocorrem várias vezes. A interação de um usuário com os diferentes elementos de uma página web pode causar uma coleção de vários tipos de eventos a serem acionados.
+
+Vamos mudar a aplicação para que o aumento do contador aconteça quando um usuário clicar em um botão, que é implementado com o elemento button (botão).
+
+Os elementos de botão suportam os chamados mouse events (Eventos de Mouse), dos quais click é o evento mais comum. O evento click em um botão também pode ser acionado com o teclado ou com uma tela touch screen, apesar de serem "evento de mouse".
+
+Em React, registra-se uma event handler function (função gerenciadora de eventos) para o evento click desta forma:
+```js
+const App = () => {
+  const [ contador, setContador ] = useState(0)
+  
+  const handleClique = () => {
+    console.log('clicado')
+  }
+
+  return (
+    <div>
+      <div>{contador}</div>
+      <button onClick={handleClique}>
+        mais+
+      </button>
+    </div>
+  )
+}
+```
+Definimos o valor do atributo onClick do botão como uma referência à função handleClique definida no código.
+
+A cada clique no botão mais+, a função handleClique é chamada, o que significa que a cada evento de clique uma mensagem clicado será registrada no console do navegador.
+
+A função gerenciadora de eventos também pode ser definida diretamente na atribuição de valor do atributo "onClick":
+```js
+const App = () => {
+  const [ contador, setContador ] = useState(0)
+
+  return (
+    <div>
+      <div>{contador}</div>
+      <button onClick={() => console.log('clicado')}>
+        mais+
+      </button>
+    </div>
+  )
+}
+```
+Ao mudar a função gerenciadora de eventos para a seguinte forma:
+```js
+<button onClick={() => setContador(contador + 1)}>
+  mais+
+</button>
+```
+atingimos o comportamento desejado, ou seja, o valor de contador é incrementado em 1 e o componente é re-renderizado.
+
+Vamos também adicionar um botão para redefinir o contador:
+```js
+const App = () => {
+  const [ contador, setContador ] = useState(0)
+
+  return (
+    <div>
+      <div>{contador}</div>
+      <button onClick={() => setContador(contador + 1)}>
+        mais+
+      </button>
+      <button onClick={() => setContador(0)}> 
+        zerar
+      </button>
+    </div>
+  )
+}
+```
+Um gerenciador de evento é uma função
+Definimos os gerenciadores de eventos para os nossos botões, onde declaramos seus atributos onClick:
+```js
+<button onClick={() => setContador(contador + 1)}> 
+  mais+
+</button>
+```
+Quebraria completamente nossa aplicação
+
+O que está acontecendo? Um gerenciador de evento deve ser uma função ou uma referência de função. Quando escrevemos:
+```js
+<button onClick={setContador(contador + 1)}>
+```
+O gerenciador de evento é, neste caso, uma chamada de função (function call). Em muitos casos isso pode até estar ok, mas não nesta situação específica. No começo, o valor da variável contador é 0. Quando React renderiza o componente pela primeira vez, ele executa a chamada de função setContador(0+1), e muda o valor do estado do componente para 1. Isso fará com que o componente seja re-renderizado, React executará a chamada da função setContador novamente e o estado mudará levando a outra re-renderização...
+
+Vamos definir os gerenciadores de eventos como fizemos antes:
+```js
+<button onClick={() => setContador(contador + 1)}> 
+  mais+
+</button>
+```
+Agora, o atributo do botão que define o que acontece quando o botão é clicado — onClick — tem o valor () => setContador(contador + 1). A função setContador é chamada somente quando um usuário clica no botão.
+
+Em geral, definir gerenciadores de eventos dentro de templates JSX não é uma boa ideia. Aqui está ok, porque nossos gerenciadores de eventos são bem simples.
+
+De qualquer jeito, vamos colocar os gerenciadores de eventos em funções separadas:
+```js
+const App = () => {
+  const [ contador, setContador ] = useState(0)
+
+  const aumentarEmUm = () => setContador(contador + 1)
+  
+  const zerarContador = () => setContador(0)
+
+  return (
+    <div>
+      <div>{contador}</div>
+      <button onClick={aumentarEmUm}>
+        mais+
+      </button>
+      <button onClick={zerarContador}>
+        zerar
+      </button>
+    </div>
+  )
+}
+```
+Aqui, os gerenciadores de eventos foram definidos corretamente. O valor do atributo onClick é uma variável que contém referência a uma função:
+```js
+<button onClick={aumentarEmUm}> 
+  mais+
+</button>
+```
+
+## Passagem de Estado para Componentes-filho
+
+Recomenda-se escrever componentes React pequenos e reutilizáveis ​​em toda a aplicação, e até mesmo em projetos. Vamos refatorar nossa aplicação para que seja composta por três componentes menores: um componente para exibir o contador e dois componentes para os botões.
+
+Vamos implementar primeiro um componente Exibir, que é responsável pela exibição do valor do contador.
+
+Uma boa prática em React é elevar o estado (lift the state up)[15] na hierarquia de componentes. A documentação diz:
+
+Com frequência, a modificação de um dado tem que ser refletida em vários componentes. Recomendamos elevar o estado compartilhado ao elemento pai comum mais próximo.
+
+Vamos colocar o estado da aplicação no componente App e passá-lo para o componente Exibir através de props:
+```js
+const Exibir = (props) => {
+  return (
+    <div>{props.contador}</div>
+  )
+}
+```
+O uso do componente é direto, objetivo, já que precisamos apenas passar o estado do contador para ele:
+```js
+const App = () => {
+  const [ contador, setContador ] = useState(0)
+
+  const aumentarEmUm = () => setContador(contador + 1)
+  const zerarContador = () => setContador(0)
+
+  return (
+    <div>
+      <Exibir contador={contador}/>
+      <button onClick={aumentarEmUm}>
+        mais+
+      </button>
+      <button onClick={zerarContador}> 
+        zerar
+      </button>
+    </div>
+  )
+}
+```
+Tudo ainda está funcionando. Quando os botões são clicados e o App é re-renderizado, todos os seus filhos, incluindo o componente Exibir, também são re-renderizados.
+
+Agora, vamos criar um componente Botao para os botões da nossa aplicação. Temos que passar o gerenciador de evento, bem como o título do botão, através das props do componente:
+```js
+const Botao = (props) => {
+  return (
+    <button onClick={props.onClick}>
+      {props.texto}
+    </button>
+  )
+}
+```
+O nosso componente App fica assim:
+```js
+const App = () => {
+  const [ contador, setContador ] = useState(0)
+
+  const aumentarEmUm = () => setContador(contador + 1)
+  const diminuirEmUm = () => setContador(contador - 1) 
+  const zerarContador = () => setContador(0)
+
+  return (
+    <div>
+      <Exibir contador={contador}/>
+      <Botao
+        onClick={aumentarEmUm}
+        texto='mais+'
+      />
+      <Botao
+        onClick={zerarContador}
+        texto='zerar'
+      />     
+      <Botao
+        onClick={diminuirEmUm}
+        texto='menos-'
+      />
+    </div>
+  )
+}
+```
+Por conta de agora termos disponível um componente Botao facilmente reutilizável, também implementamos uma nova funcionalidade em nossa aplicação, adicionando um botão que pode ser usado para decrementar o contador.
+
+O gerenciador de evento é passado para o componente Botao através da prop onClick. O nome da prop em si não é algo tão significativo, mas a escolha do nome que colocamos não foi de todo aleatória. O próprio tutorial oficial do React[16] sugere essa convenção.
+
+
+## Alterações no estado causam re-renderização
+
+Vamos revisar, mais uma vez, os princípios mais importantes de como uma aplicação funciona.
+
+Quando a aplicação inicia, o código em App é executado. Este código usa um hook useState para criar o estado da aplicação, definindo um valor inicial da variável contador. Este componente contém o componente Exibir — que exibe o valor do contador, 0 — e três componentes Botao. Os botões possuem gerenciadores de eventos, que são usados para mudar o estado do contador.
+
+Quando um dos botões é clicado, o gerenciador de evento é executado. O gerenciador de evento muda o estado do componente App com a função setContador. Chamar uma função que muda o estado faz com que o componente seja re-renderizado.
+
+Então, se um usuário clicar no botão mais+, o gerenciador de evento do botão muda o valor de contador para 1, e o componente App é re-renderizado. Isso faz com que seus subcomponentes Exibir e Botao também sejam re-renderizados. Exibir recebe o novo valor do contador, 1, como props. Os componentes Botao recebem gerenciadores de eventos que podem ser usados para mudar o estado do contador.
+
+Para ter certeza de que você entendeu como o programa funciona, vamos adicionar algumas declarações console.log a ele:
+```js
+const App = () => {
+  const [ contador, setContador ] = useState(0)
+  console.log('renderizando com o valor do contador em', contador)
+
+  const aumentarEmUm = () => {
+    console.log('aumentando, valor anterior', contador)
+    setContador(contador + 1)
+  }
+
+  const diminuirEmUm = () => { 
+    console.log('diminuindo, valor anterior', contador)
+    setContador(contador - 1)
+  }
+
+  const zerarContador = () => {
+    console.log('zerando, valor anterior', contador)
+    setContador(0)
+  }
+
+  return (
+    <div>
+      <Exibir contador={contador} />
+      <Botao handleClique={aumentarEmUm} texto="mais+" />
+      <Botao handleClique={zerarContador} texto="zerar" />
+      <Botao handleClique={diminuirEmUm} texto="menos-" />
+    </div>
+  )
+} 
+```
+Vejamos agora o que é renderizado no console quando os botões "mais+", "zerar" e "menos-" são clicados:
+
+navegador mostrando o console com a renderização de valores em destaque
+Nunca tente adivinhar o que o seu código faz. É melhor usar console.log e ver com seus próprios olhos o que ele faz.
+
+Refatorando os Componentes
+O componente que exibe o valor do contador é o seguinte:
+```js
+const Exibir = (props) => {
+  return (
+    <div>{props.contador}</div>
+  )
+}
+```
+O componente só usa o campo contador de suas props. Isso significa que podemos simplificar o componente usando desestruturação, desta forma:
+```js
+const Exibir = ({ contador }) => {
+  return (
+    <div>{contador}</div>
+  )
+}
+```
+A função que define o componente contém apenas a instrução de retorno, então podemos definir a função usando a forma mais compacta das arrow functions:
+```js
+const Exibir = ({ contador }) => <div>{contador}</div>
+```
+Também podemos simplificar o componente Botao:
+```js
+const Botao = (props) => {
+  return (
+    <button onClick={props.onClick}>
+      {props.texto}
+    </button>
+  )
+}
+```
+Podemos usar a desestruturação para obter apenas os campos necessários de props e usar a forma mais compacta de arrow functions:
+```js
+const Botao = ({ onClick, texto }) => (
+  <button onClick={onClick}>
+    {texto}
+  </button>
+)
+```
+Podemos simplificar ainda mais o componente Botao, fazendo com que a declaração de retorno caiba em apenas uma linha:
+```js
+const Botao = ({ onClick, texto }) => <button onClick={onClick}>{texto}</button>
+```
+Porém, tenha cuidado para não simplificar demais seus componentes, porque pode ficar mais difícil lidar com a complexidade do código à medida em que ele for crescendo em tamanho.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 [1] https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions
@@ -793,3 +1210,5 @@ Fazer repetidas chamadas ao método render não é a forma recomendada de re-ren
 [12] https://developer.mozilla.org/en-US/docs/Web/JavaScript/Language_Overview
 [13] https://github.com/getify/You-Dont-Know-JS
 [14] https://eloquentjavascript.net/
+[15] https://legacy.reactjs.org/docs/lifting-state-up.html
+[16] https://react.dev/learn/tutorial-tic-tac-toe
