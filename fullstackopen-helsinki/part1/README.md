@@ -1142,20 +1142,217 @@ const Botao = ({ onClick, texto }) => <button onClick={onClick}>{texto}</button>
 ```
 Porém, tenha cuidado para não simplificar demais seus componentes, porque pode ficar mais difícil lidar com a complexidade do código à medida em que ele for crescendo em tamanho.
 
+Código final desse sub-módulo
+```js
+import { useState } from 'react'
+import axios from 'axios'
 
+const App = () => {
+  let [ contador, setContador ] = useState(0)
 
+  const sumOne = () => {
+    console.log("somou 1, resultado: ", contador)
+    setContador(contador + 1)
+  }
+  const reduceOne = () => setContador(contador - 1)
+  const resetCounter = () => setContador(0)
+  const sumTwo = () => setContador(contador + 2)
+  const alertMsg = () => alert("ALERTAAAA!!!")
+  const powerOfTwo = () => setContador(contador * contador)
+  console.log(contador)
+  if (contador == 0){
+    console.log("limpei o console", console.clear())
+  }
+  if (contador == 'Infinity'){
+    console.log("infinitamente louco")
+  }
 
+  return (
+    <div>
+      <ul>
+        {
+          axios({
+            method: 'get',
+            url: 'https://dog.ceo/api/breeds/image/random',
+            responseType: 'stream'
+          }).then(function (response){
+            response.data.pipe(fs.createWriteStream('abc'))
+          })
+        }
+      </ul>
+      <Show contador={contador} />
+      <Button 
+        onClick={sumOne} 
+        text="sum one" 
+      />
+      <Button
+        onClick={reduceOne}
+        text="minus one"
+      />
+      <Button
+        onClick={resetCounter}
+        text="reset"
+      />
+      <Button
+        onClick={sumTwo}
+        text="sum two"
+      />
+      <Button
+        onClick={alertMsg}
+        text="alert message"
+      />
+      <Button
+        onClick={powerOfTwo}
+        text="power of two"
+      />
+    </div>
+  )
+}
 
+const Show = ({ contador }) => <div>{contador}</div>
 
+const Button = ({ onClick, text }) => <button onClick={onClick}> {text} </button>
 
+export default App
+```
 
+## Um estado mais complexo e depuração de aplicações React
+Um estado complexo (complex state)
 
+Em nosso exemplo anterior, o estado da aplicação era simples, pois consistia em apenas um número inteiro. E se a nossa aplicação precisar de um estado mais complexo?
 
+Na maioria dos casos, a maneira mais fácil e melhor de fazer isso é usando a função useState múltiplas vezes para criar "pedaços" separados de estado.
 
+No código a seguir, criamos dois pedaços de estado para a aplicação, chamados esquerda e direita, ambos com o valor inicial 0:
+```js
+const App = () => {
+  const [esquerda, setEsquerda] = useState(0) 
+  const [direita, setDireita] = useState(0) 
 
+  return (
+    <div>
+      {esquerda}
+      <button onClick={() => setEsquerda(esquerda + 1)}>
+        Esquerda
+      </button>
+      <button onClick={() => setDireita(direita + 1)}>
+        Direita
+      </button>
+      {direita}
+    </div>
+  )
+}
+```
 
+O componente têm acesso às funções setEsquerda e setDireita, que podem ser usadas para atualizar os dois pedaços de estado.
 
+O estado ou um pedaço de estado do componente pode ser de qualquer tipo. Poderíamos implementar a mesma funcionalidade salvando a contagem de cliques tanto dos botões "esquerda" quanto "direita" em um único objeto:
+```js
+{
+  esquerda: 0,
+  direita: 0
+}
+```
+Nesse caso, a aplicação ficaria assim:
+```js
+const App = () => {
+  const [cliques, setCliques] = useState({ 
+    esquerda: 0, direita: 0
+  })
 
+  const handleCliqueEsquerda = () => {
+    const novosCliques = { 
+      esquerda: cliques.esquerda + 1, 
+      direita: cliques.direita 
+    }
+    setCliques(novosCliques)
+  }
+
+  const handleCliqueDireita = () => {
+    const novosCliques = { 
+      esquerda: cliques.esquerda, 
+      direita: cliques.direita + 1 
+    }
+    setCliques(novosCliques)
+  }
+
+  return (
+    <div>
+      {cliques.esquerda}
+      <button onClick={handleCliqueEsquerda}>Esquerda</button>
+      <button onClick={handleCliqueDireita}>Direita</button>
+    </div>
+  )
+}
+```
+Agora, o componente tem apenas um único pedaço de estado, e os gerenciadores de eventos precisam cuidar da mudança do estado inteiro da aplicação.
+
+O formato do gerenciador de evento parece confuso aqui. Quando o botão da esquerda é clicado, a seguinte função é chamada:
+```js
+const handleCliqueEsquerda = () => {
+  const novosCliques = { 
+    esquerda: cliques.esquerda + 1, 
+    direita: cliques.direita 
+  }
+  setCliques(novosCliques)
+}
+```
+O objeto a seguir é definido como o novo estado da aplicação:
+```js
+{
+  esquerda: cliques.esquerda + 1,
+  direita: cliques.direita
+}
+```
+
+O novo valor da propriedade esquerda agora é o mesmo que o valor de esquerda + 1 do estado anterior, e o valor da propriedade direita é o mesmo que o valor da propriedade direita do estado anterior.
+
+Podemos definir mais claramente o novo objeto de estado usando a (sintaxe de espalhamento) (Spread syntax (...)[17]) que foi adicionada à especificação da linguagem no verão de 2018:
+```js
+const handleCliqueEsquerda = () => {
+  const novosCliques = { 
+    ...cliques, 
+    esquerda: cliques.esquerda + 1 
+  }
+  setCliques(novosCliques)
+}
+
+const handleCliqueDireita = () => {
+    ...cliques, 
+    direita: cliques.direita + 1 
+  }
+  setCliques(novosCliques)
+}
+```
+
+A sintaxe pode parecer um tanto estranha no começo. Na prática, { ...cliques } cria um novo objeto que tem cópias de todas as propriedades do objeto cliques. Quando discriminamos uma propriedade específica — por exemplo, direita em { ...cliques, direita: 1 }, o valor da propriedade direita no novo objeto será 1.
+
+No exemplo acima, este trecho:
+```js
+{ ...cliques, direita: cliques.direita + 1 }
+```
+
+cria uma cópia do objeto cliques, onde o valor da propriedade direita é aumentado em 1.
+
+Não é necessário atribuir o objeto a uma variável nos gerenciadores de eventos, e podemos simplificar as funções da seguinte maneira:
+```js
+const handleCliqueEsquerda = () =>
+  setCliques({ ...cliques, esquerda: cliques.esquerda + 1 })
+
+const handleCliqueDireita = () =>
+```
+Alguns leitores podem estar se perguntando o motivo de não termos atualizado o estado diretamente, desta forma:
+```js
+const handleCliqueEsquerda = () => {
+  cliques.esquerda++
+  setCliques(cliques)
+}
+```
+A aplicação parece funcionar. Entretanto, em React, é proibido mudar (mutate) diretamente o estado, já que pode resultar em efeitos colaterais inesperados[18]. A mudança de estado sempre tem que ser feita pela definição/atribuição do estado a um novo objeto. Se as propriedades do objeto de estado anterior não forem alteradas, podem simplesmente ser copiadas, o que se faz copiando essas propriedades em um novo objeto e definindo-o como o novo estado.
+
+Armazenar todo o estado em um único objeto de estado é uma má escolha para esta aplicação, especificamente; não há qualquer benefício aparente, e a aplicação resultante fica muito mais complexa. Neste caso, armazenar os contadores de cliques em pedaços separados de estado é uma escolha muito mais adequada.
+
+Há situações em que pode ser benéfico armazenar um pedaço de estado da aplicação em uma estrutura de dados mais complexa. A documentação oficial de React contém algumas orientações úteis sobre o assunto.
 
 
 
@@ -1212,3 +1409,5 @@ Porém, tenha cuidado para não simplificar demais seus componentes, porque pode
 [14] https://eloquentjavascript.net/
 [15] https://legacy.reactjs.org/docs/lifting-state-up.html
 [16] https://react.dev/learn/tutorial-tic-tac-toe
+[17] https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax
+[18] https://stackoverflow.com/questions/37755997/why-cant-i-directly-modify-a-components-state-really/40309023#40309023

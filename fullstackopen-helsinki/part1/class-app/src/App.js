@@ -1,70 +1,34 @@
-import { useState } from 'react'
-import axios from 'axios'
+import React from "react"
+import { useState } from "react"
 
 const App = () => {
-  let [ contador, setContador ] = useState(0)
+  const [cliques, setCliques] = useState({
+    esquerda:0,
+    centro: 0,
+    direita: 0
+  })
 
-  const sumOne = () => {
-    console.log("somou 1, resultado: ", contador)
-    setContador(contador + 1)
-  }
-  const reduceOne = () => setContador(contador - 1)
-  const resetCounter = () => setContador(0)
-  const sumTwo = () => setContador(contador + 2)
-  const alertMsg = () => alert("ALERTAAAA!!!")
-  const powerOfTwo = () => setContador(contador * contador)
-  console.log(contador)
-  if (contador == 0){
-    console.log("limpei o console", console.clear())
-  }
-  if (contador == 'Infinity'){
-    console.log("infinitamente louco")
-  }
+  const handleCliqueEsquerda = () => 
+    setCliques({ ...cliques, esquerda: cliques.esquerda + 1 })
+  
+  const handleCliqueCentro = () => 
+    setCliques({ ...cliques, direita: cliques.direita + 1})
 
-  return (
+  const handleCliqueDireita = () => 
+    setCliques({ ...cliques, centro: cliques.centro + 1})
+
+    return(
     <div>
-      <ul>
-        {
-          axios({
-            method: 'get',
-            url: 'https://dog.ceo/api/breeds/image/random',
-            responseType: 'stream'
-          }).then(function (response){
-            response.data.pipe(fs.createWriteStream('abc'))
-          })
-        }
-      </ul>
-      <Show contador={contador} />
-      <Button 
-        onClick={sumOne} 
-        text="sum one" 
-      />
-      <Button
-        onClick={reduceOne}
-        text="minus one"
-      />
-      <Button
-        onClick={resetCounter}
-        text="reset"
-      />
-      <Button
-        onClick={sumTwo}
-        text="sum two"
-      />
-      <Button
-        onClick={alertMsg}
-        text="alert message"
-      />
-      <Button
-        onClick={powerOfTwo}
-        text="power of two"
-      />
+      {cliques.esquerda}
+      <button onClick={handleCliqueEsquerda}>Esquerda</button>
+      <br></br>
+      {cliques.centro}
+      <button onClick={handleCliqueCentro}>Centro</button>
+      <br></br>
+      {cliques.direita}
+      <button onClick={handleCliqueDireita}>Direita</button>
     </div>
   )
 }
-
-const Show = ({ contador }) => <div>{contador}</div>
-
-const Button = ({ onClick, text }) => <button onClick={onClick}> {text} </button>
 
 export default App
