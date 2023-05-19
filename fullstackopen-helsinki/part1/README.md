@@ -1790,6 +1790,380 @@ O gerenciamento de eventos se mostrou um tópico difícil em iterações anterio
 Por essa razão, revisaremos o tópico.
 
 Vamos supor que estejamos desenvolvendo essa aplicação simples com o seguinte componente App:
+```Js
+const App = () => {
+  const [valor, setValor] = useState(10)
+
+  return (
+    <div>
+      {valor}
+      <button>zerar</button>
+    </div>
+  )
+}
+```
+Queremos que o clique do botão reinicialize o estado armazenado na variável valor.
+
+Para fazer com que o botão reaja a um evento de clique, precisamos adicionar um gerenciador de evento a ele.
+
+Os gerenciadores de eventos devem sempre ser uma função ou uma referência a uma função. O botão não funcionará se o gerenciador de evento for definido como uma variável de outro tipo.
+
+Se definíssemos o gerenciador de evento como uma string:
+
+<button onClick="lixo...">botão</button>
+o React nos avisaria sobre isso no console:
+
+index.js:2178 Warning: Expected `onClick` listener to be a function, instead got a value of `string` type.
+    in button (at index.js:20)
+    in div (at index.js:18)
+    in App (at index.js:27)
+A mensagem de erro diz: index.js:2178 Aviso: Esperava-se que o ouvinte onClickfosse uma função, mas obteve-se um valor do tipo string.
+
+O seguinte também não funcionaria:
+```Js
+<button onClick={valor + 1}>botão</button>
+```
+Tentamos definir o gerenciador de evento como valor + 1, o que simplesmente retorna o resultado da operação. React nos avisará sobre isso no console:
+
+index.js:2178 Warning: Expected `onClick` listener to be a function, instead got a value of `number` type.
+A mensagem de erro diz: index.js:2178 Aviso: Esperava-se que o ouvinte onClickfosse uma função, mas obteve-se um valor do tipo number.
+
+Este também não funcionaria:
+```js
+<button onClick={valor = 0}>botão</button>
+```
+O gerenciador de evento não é uma função, mas uma atribuição de variável, e React, mais uma vez, emitirá um aviso no console. Esta tentativa também é falha no sentido de que nunca devemos mudar diretamente o estado em React.
+
+Vejamos o próximo exemplo:
+```js
+<button onClick={console.log('clicou no botão')}>
+  botão
+</button>
+```
+A mensagem é impressa no console assim que o componente é renderizado, mas nada acontece quando clicamos no botão. Por que não funciona mesmo quando nosso gerenciador de evento contém a função console.log?
+
+O problema aqui é que nosso gerenciador de evento é definido como uma chamada de função, o que significa que o gerenciador de evento é atribuído ao valor retornado da função, que no caso de console.log é undefined (indefinido).
+
+A função console.log é chamada quando o componente é renderizado e, por esse motivo, é impresso uma vez no console.
+
+A tentativa a seguir também não funciona:
+```Js
+<button onClick={setValue(0)}>botão</button>
+```
+Novamente, tentamos definir uma chamada de função como o gerenciador de evento. Isso não funciona. Essa tentativa específica também causa outro problema: quando o componente é renderizado, a função setValue(0) é executada, o que por sua vez faz com que o componente seja renderizado novamente. A re-renderização, por conseguinte, chama setValue(0) novamente, resultando em uma recursão infinita.
+
+A execução de uma chamada de função específica quando o botão é clicado pode ser realizada da seguinte maneira:
+```Js
+<button onClick={() => console.log('clicou no botão')}>
+  botão
+</button>
+```
+Agora, o gerenciador de evento é uma função definida com a sintaxe de uma arrow function, isto é, () => console.log('clicou no botão'). Quando o componente é renderizado, nenhuma função é chamada e apenas a referência à arrow function é definida como o gerenciador de evento. A chamada da função ocorre apenas quando o botão é clicado.
+
+Podemos implementar a reinicialização do estado em nossa aplicação com essa mesma técnica:
+```js
+<button onClick={() => setValue(0)}>botão</button>
+```
+O gerenciador de evento agora é a função () => setValue(0).
+
+Definir gerenciadores de eventos diretamente no atributo do botão nem sempre é a melhor opção a se aplicar.
+
+Você verá frequentemente gerenciadores de eventos definidos em um lugar separado. Na versão seguinte de nossa aplicação, definimos uma função que então é atribuída à variável handleClique no corpo da função do componente:
+```js
+const App = () => {
+  const [valor, setValor] = useState(10)
+
+  const handleClique = () =>
+    console.log('clicou no botão')
+
+  return (
+    <div>
+      {valor}
+      <button onClick={handleClique}>botão</button>
+    </div>
+  )
+}
+Agora, a variável handleClique está atribuída a uma referência à função. A referência é passada ao botão como o atributo onClick:
+
+<button onClick={handleClique}>botão</button>
+```
+Naturalmente, nossa função gerenciadora de eventos pode ser composta por múltiplos comandos. Nestes casos, usamos a sintaxe de chaves mais longa para arrow functions:
+```js 
+const App = () => {
+  const [valor, setValor] = useState(10)
+
+  const handleClique = () => {
+    console.log('clicou no botão')
+    setValor(0)
+  }
+
+  return (
+    <div>
+      {valor}
+      <button onClick={handleClique}>botão</button>
+    </div>
+  )
+}
+```
+
+Código até feito até o fim desta parte:
+```js
+import React from "react"
+import { useState } from "react"
+
+const App = () => {
+  const [valor, setValor] = useState(0)
+  
+  const maisUm = () => setValor(valor + 1)
+  const maisDez = () => setValor(valor + 10)
+  const zerar = () => setValor(0)
+
+  if (valor == 42)
+  {
+    return (
+    <div>
+      <h1>Zerar</h1>   
+      {valor}
+      <button onClick={() => zerar()}>Zerar</button>
+    </div>
+    )
+  }
+  if (valor >= 40)
+  {
+    return (
+    <div>
+      <h1>Mais um</h1>   
+      {valor}
+      <button onClick={() => maisUm()}>Mais um</button>
+    </div>
+    )
+  }
+  else
+  {
+    return (
+    <div>
+      <h1>Mais 10</h1>   
+      {valor}
+      <button onClick={() => maisDez()}>Mais 10</button>
+    </div>
+    )
+  }
+}
+
+export default App
+```
+
+## Uma função que retorna outra função
+
+Outra maneira de definir um gerenciador de evento é usar uma função que retorna outra função.
+
+Provavelmente, você não precisará usar funções que retornam funções em nenhum dos exercícios deste curso. Se o tópico parecer confuso demais, você pode pular esta seção por enquanto e retornar a ela mais tarde.
+
+Vamos fazer as seguintes alterações em nosso código:
+```js
+const App = () => {
+  const [valor, setValor] = useState(10)
+
+  const ola = () => {
+    const gerenciador = () => console.log('Olá, mundo!')
+    return gerenciador
+  }
+
+  return (
+    <div>
+      {valor}
+      <button onClick={ola()}>botão</button>
+    </div>
+  )
+}
+```
+O código funciona corretamente, apesar de parecer complicado.
+
+O gerenciador de evento agora está definido como uma chamada de função:
+
+<button onClick={ola()}>botão</button>
+Anteriormente, afirmamos que um gerenciador de evento não pode ser uma chamada de função e que precisa ser ou uma função ou uma referência a uma função. Então, por que uma chamada de função funciona neste caso?
+
+Quando o componente é renderizado, a seguinte função é executada:
+```Js
+const ola = () => {
+  const gerenciador = () => console.log('Olá, mundo!')
+
+  return gerenciador
+}
+```
+O valor de retorno da função é outra função que é atribuída à variável gerenciador.
+
+Quando o React renderiza a linha:
+
+<button onClick={ola()}>botão</button>
+Ele atribui o valor de retorno de ola() ao atributo onClick. Essencialmente, a linha se transforma em:
+
+<button onClick={() => console.log('Olá, mundo!')}>
+  botão
+</button>
+Como a função ola retorna uma função, o gerenciador de evento passa, agora, a ser uma função.
+
+Qual é o objetivo deste conceito?
+
+Vamos mudar um pouco o código:
+```Js
+const App = () => {
+  const [valor, setValor] = useState(10)
+
+  const ola = (quem) => {
+    const gerenciador = () => {
+      console.log('Olá', quem)
+    }
+    return gerenciador
+  }
+
+  return (
+    <div>
+      {valor}
+      <button onClick={ola('mundo')}>botão</button>
+      <button onClick={ola('react')}>botão</button>
+      <button onClick={ola('função')}>botão</button>
+    </div>
+  )
+}
+```
+Agora, a aplicação têm três botões com gerenciadores de eventos definidos pela função ola que aceita um único parâmetro.
+
+O primeiro botão é definido como:
+
+<button onClick={ola('mundo')}>botão</button>
+O gerenciador de evento é criado executando a chamada da função ola('mundo'). A chamada da função retorna a função:
+
+() => {
+  console.log('Olá', 'mundo')
+}
+O segundo botão é definido como:
+
+<button onClick={ola('react')}>botão</button>
+A chamada da função ola('react') que cria o gerenciador de evento retorna:
+```js
+() => {
+  console.log('Olá', 'react')
+}
+```
+Ambos os botões obtêm seus gerenciadores de eventos individualizados.
+
+Funções que retornam funções podem ser utilizadas na definição de funcionalidades genéricas que podem ser personalizadas com parâmetros. A função ola que cria os gerenciadores de eventos pode ser analisada como uma fábrica que produz gerenciadores de eventos personalizados destinados a saudar usuários.
+
+Nossa definição atual é um tanto verbosa:
+```Js
+const ola = (quem) => {
+  const gerenciador = () => {
+    console.log('Olá', quem)
+  }
+
+  return gerenciador
+}
+```
+Vamos excluir as variáveis de ajuda e retornar diretamente a função criada:
+```js
+const ola = (quem) => {
+  return () => {
+    console.log('Olá', quem)
+  }
+}
+```
+Por conta de nossa função ola ser composta por um único comando de retorno, podemos omitir as chaves e usar a sintaxe mais compacta para funções de seta:
+```js
+const ola = (quem) =>
+  () => {
+    console.log('Olá', quem)
+  }
+```
+Por fim, vamos escrever todas as setas na mesma linha:
+```js
+const ola = (quem) => () => {
+  console.log('Olá', quem)
+}
+```
+Podemos usar o mesmo "macete" para definir gerenciadores de eventos que definem o estado do componente para um determinado valor. Vamos fazer as seguintes alterações em nosso código:
+```js
+const App = () => {
+  const [valor, setValor] = useState(10)
+  
+  const setNoValor = (novoValor) => () => {
+    console.log('setValor atual', novoValor)  // Imprime o novo valor no console
+    setValor(novoValor)
+  }
+  
+  return (
+    <div>
+      {valor}
+      <button onClick={setNoValor(1000)}>mil</button>
+      <button onClick={setNoValor(0)}>zerar</button>
+      <button onClick={setNoValor(valor + 1)}>incrementar</button>
+    </div>
+  )
+}
+```
+Quando o componente é renderizado, é criado o botão mil:
+
+<button onClick={setNoValor(1000)}>mil</button>
+O gerenciador de evento é definido como o valor retornado de setNoValor(1000), que é a seguinte função:
+```js
+() => {
+  console.log('setValor atual', 1000)
+  setValor(1000)
+}
+```
+O botão de incremento é declarado da seguinte forma:
+```js
+<button onClick={setNoValor(valor + 1)}>incrementar</button>
+```
+O gerenciador de evento é criado pela chamada da função setNoValor(valor + 1), que recebe como parâmetro o valor atual da variável de estado valor incrementado em 1 (um). Se o conteúdo de valor fosse 10, então o gerenciador de evento criado seria a seguinte função:
+```Js
+() => {
+  console.log('setValor atual', 11)
+  setValor(11)
+}
+```
+Não é necessário usar funções que retornam funções para alcançar esta funcionalidade. Vamos retornar a função setNoValor, responsável por atualizar o estado, como uma função normal:
+```Js
+const App = () => {
+  const [valor, setValor] = useState(10)
+
+  const setNoValor = (novoValor) => {
+    console.log('setValor atual', novoValor)
+    setValor(novoValor)
+  }
+
+  return (
+    <div>
+      {valor}
+      <button onClick={() => setNoValor(1000)}>
+        mil
+      </button>
+      <button onClick={() => setNoValor(0)}>
+        zerar
+      </button>
+      <button onClick={() => setNoValor(valor + 1)}>
+        incrementar
+      </button>
+    </div>
+  )
+}
+```
+Agora, podemos definir o gerenciador de evento como uma função que chama a função setNoValor com um parâmetro apropriado. O gerenciador de evento utilizado para redefinir o estado da aplicação seria:
+
+<button onClick={() => setNoValor(0)}>zerar</button>
+Escolher entre as duas formas apresentadas de definir seus gerenciadores de eventos é, em grande parte, uma questão de gosto.
+
+
+
+
+
+
+
+
+
+
+
 
 
 
