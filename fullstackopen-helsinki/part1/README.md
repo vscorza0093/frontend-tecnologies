@@ -1217,7 +1217,6 @@ export default App
 ```
 
 ## Um estado mais complexo e depuração de aplicações React
-Um estado complexo (complex state)
 
 Em nosso exemplo anterior, o estado da aplicação era simples, pois consistia em apenas um número inteiro. E se a nossa aplicação precisar de um estado mais complexo?
 
@@ -1355,26 +1354,442 @@ Armazenar todo o estado em um único objeto de estado é uma má escolha para es
 Há situações em que pode ser benéfico armazenar um pedaço de estado da aplicação em uma estrutura de dados mais complexa. A documentação oficial de React contém algumas orientações úteis sobre o assunto.
 
 
+## Gerenciando Arrays
+
+Vamos adicionar um pedaço de estado à nossa aplicação contendo o array todosOsCliques, que lembra cada clique que ocorreu na aplicação.
+```js
+const App = () => {
+  const [esquerda, setEsquerda] = useState(0)
+  const [direita, setDireita] = useState(0)
+  const [todosOsCliques, setTodos] = useState([])
+
+  const handleCliqueEsquerda = () => {
+    setTodos(todosOsCliques.concat('E'))
+    setEsquerda(esquerda + 1)
+  } 
+
+  const handleCliqueDireita = () => {
+    setDireita(direita + 1)
+  }
+
+  return (
+    <div>
+      {esquerda}
+      <button onClick={handleCliqueEsquerda}>Esquerda</button>
+      <button onClick={handleCliqueDireita}>Direita</button>
+      <p>{todosOsCliques.join(' ')}</p>
+    </div>
+  )
+}
+```
+Cada clique é armazenado em um pedaço separado de estado chamado todosOsCliques, que é inicializado como um array vazio:
+
+const [todosOsCliques, setTodos] = useState([])
+Quando o botão Esquerda é clicado, adicionamos a letra E ao array todosOsCliques:
+```js
+const handleCliqueEsquerda = () => {
+  setTodos(todosOsCliques.concat('E'))
+  setEsquerda(esquerda + 1)
+}
+```
+O pedaço de estado armazenado em todosOsCliques agora é definido para ser um array que contém todos os itens do array anterior mais a letra E. O método concat (concatenar) adiciona o novo item ao array, que não muda o array existente, mas sim retorna uma nova cópia do array com o item adicionado a ele.
+
+Como mencionado anteriormente, também é possível em JavaScript adicionar itens a um array com o método push (Significa, literalmente, "empurrar", "apertar", "pressionar". Porém, nestes termos, o método push() ADICIONA um ou mais elementos ao final de um array e retorna o novo comprimento desse array). Se adicionarmos o item "empurrando-o" para o array todosOsCliques e então atualizando o estado, a aplicação ainda aparentará funcionar:
+```js
+const handleCliqueEsquerda = () => {
+  todosOsCliques.push('E')
+  setTodos(todosOsCliques)
+  setEsquerda(esquerda + 1)
+}
+```
+No entanto, não faça isso. Como mencionado anteriormente, o estado dos componentes em React, tal como todosOsCliques, não devem ser mudados diretamente. Mesmo se mudando o estado parecer funcionar em alguns casos, tal decisão pode levar a erros no código muito difíceis de depurar.
+
+Vamos olhar mais de perto em como o clique é renderizado na página:
+```js
+const App = () => {
+  // ...
+
+  return (
+    <div>
+      {esquerda}
+      <button onClick={handleCliqueEsquerda}>Esquerda</button>
+      <button onClick={handleCliqueDireita}>Direita</button>
+      {direita}
+      <p>{todosOsCliques.join(' ')}</p>
+    </div>
+  )
+}
+```
+Chamamos o método join (juntar, conectar) no array todosOsCliques que une todos os itens em uma única string, separados pela string passada como parâmetro da função, que no caso é um espaço vazio.
+
+## A atualização do estado é assíncrona
+
+Vamos expandir a aplicação para que ela mantenha o controle do número total de cliques nos botões no estado total, cujo valor é sempre atualizado quando os botões são pressionados:
+```js
+const App = () => {
+  const [esquerda, setEsquerda] = useState(0)
+  const [direita, setDireita] = useState(0)
+  const [todosOsCliques, setTodos] = useState([])
+  const [total, setTotal] = useState(0)
+
+  const handleCliqueEsquerda = () => {
+    setTodos(todosOsCliques.concat('E'))
+    setEsquerda(esquerda + 1)
+    setTotal(esquerda + direita)
+  }
+
+  const handleCliqueDireita = () => {
+    setDireita(direita + 1)
+    setTotal(esquerda + direita)
+  }
+
+  return (
+    <div>
+      {esquerda}
+      <button onClick={handleCliqueEsquerda}>Esquerda</button>
+      <button onClick={handleCliqueDireita}>Direita</button>
+      <p>{todosOsCliques.join(' ')}</p>
+      <p>Total {total}</p>
+    </div>
+  )
+}
+```
+A solução não funciona corretamente:
+
+o navegador mostrando 2 left|right 1, RLL total 2
+Por alguma razão, o total de cliques nos botões está sempre um clique atrás do valor real.
+
+Vamos adicionar alguns comandos console.logao gerenciador de eventos:
+```js
+const App = () => {
+  // ...
+  const handleCliqueEsquerda = () => {
+    setTodos(todosOsCliques.concat('E'))
+    console.log('clique esquerdo anterior', esquerda)
+    setEsquerda(esquerda + 1)
+    console.log('clique esquerdo posterior', esquerda)
+    setTotal(esquerda + direita)
+  }
+
+  // ...
+}
+```
+O console revela o problema:
+
+o console das ferramentas do desenvolvedor exibe left before 4 and left after 4
+Embora um novo valor tenha sido definido para esquerda chamando setEsquerda(esquerda + 1), o valor antigo ainda está lá, apesar da atualização! Por causa disso, a tentativa de contar o número de cliques nos botões produz um resultado menor do que o correto:
+
+setTotal(esquerda + direita) 
+O motivo para isso é que uma atualização de estado no React acontece assincronicamente (asynchronously), ou seja, não imediatamente, mas "em algum momento" antes que o componente seja renderizado novamente.
+
+Podemos consertar a aplicação da seguinte forma:
+```js
+const App = () => {
+  // ...
+  const handleCliqueEsquerda = () => {
+    setTodos(todosOsCliques.concat('E'))
+    const atualizaEsquerda = esquerda + 1
+    setEsquerda(atualizaEsquerda)
+    setTotal(atualizaEsquerda + direita)
+  }
+
+  // ...
+}
+```
+Assim, o número de cliques nos botões é agora, de forma definitiva, baseado no número correto de cliques no botão esquerdo.
 
 
+## Renderização Condicional
+
+Vamos modificar nossa aplicação para que a renderização do histórico de cliques seja gerenciada por um novo componente chamado Historico:
+```js
+const Historico = (props) => {
+  if (props.todosOsCliques.length === 0) {
+    return (
+      <div>
+        Clique em um dos botões para usar a aplicação!
+      </div>
+    )
+  }
+  return (
+    <div>
+      Histórico de cliques nos botões: {props.todosOsCliques.join(' ')}
+    </div>
+  )
+}
+
+const App = () => {
+  // ...
+
+  return (
+    <div>
+      {esquerda}
+      <button onClick={handleCliqueEsquerda}>Esquerda</button>
+      <button onClick={handleCliqueDireita}>Direita</button>
+      {direita}
+      <Historico todosOsCliques={todosOsCliques} />
+    </div>
+  )
+}
+```
+Agora, o comportamento do componente depende se algum dos botões foi clicado ou não. Se não, ou seja, o array todosOsCliques estando vazio, o componente renderiza um elemento "div" com algumas instruções:
+
+<div>Clique em um dos botões para usar a aplicação!</div>
+E em todos os outros casos, o componente renderiza o histórico de cliques:
+
+<div>
+  Histórico de cliques nos botões: {props.todosOsCliques.join(' ')}
+</div>
+O componente Historico renderiza elementos React completamente diferentes dependendo do estado da aplicação. Isso é chamado de renderização condicional (conditional rendering).
+
+React também oferece muitas outras formas de fazer renderização condicional. Veremos isso na prática na Parte 2.
+
+Vamos fazer mais uma modificação a nossa aplicação, refatorando-a para usar o componente Botao que definimos anteriormente:
+```js
+const Historico = (props) => {
+  if (props.todosOsCliques.length === 0) {
+    return (
+      <div>
+        Clique em um dos botões para usar a aplicação!
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      Histórico de cliques nos botões: {props.todosOsCliques.join(' ')}
+    </div>
+  )
+}
+
+const Botao = ({ handleClique, texto }) => (
+  <button onClick={handleClique}>
+    {texto}
+  </button>
+)
+
+const App = () => {
+  const [esquerda, setEsquerda] = useState(0)
+  const [direita, setDireita] = useState(0)
+  const [todosOsCliques, setTodos] = useState([])
+
+  const handleCliqueEsquerda = () => {
+    setTodos(todosOsCliques.concat('E'))
+    setEsquerda(esquerda + 1)
+  }
+
+  const handleCliqueDireita = () => {
+    setDireita(direita + 1)
+  }
+
+  return (
+    <div>
+      {esquerda}
+      <Botao handleClique={handleCliqueEsquerda} texto='Esquerda' />
+      <Botao handleClique={handleCliqueDireita} texto='Direita' />
+      {direita}
+      <Historico todosOsCliques={todosOsCliques} />
+    </div>
+  )
+}
+```
+
+## Depuração de aplicações React
+
+Grande parte do tempo de um desenvolvedor é gasto na depuração e na leitura de códigos existentes. De vez em quando, conseguimos escrever uma ou duas linhas de código novo, mas grande parte do nosso tempo é gasto tentando descobrir por que algo está quebrado ou como algo funciona. Boas práticas e ferramentas de depuração são extremamente importantes por esta razão.
+
+Felizmente para nós, React é uma biblioteca extremamente amigável para com os desenvolvedores quando se trata de depuração.
+
+Antes de continuarmos, vamos nos lembrar de uma das regras mais importantes do desenvolvimento web.
+
+A primeira regra do desenvolvimento web
+Mantenha o Console do navegador aberto o tempo todo.
+
+A guia Console em particular deve estar sempre aberta, a menos que haja uma razão específica para visualizar outra guia.
+
+Mantenha tanto o seu código quanto a página web abertos juntos o tempo todo.
+
+Se e quando seu código não compilar e seu navegador brilhar igual uma árvore de Natal:
+
+captura de tela do código
+não escreva nenhuma linha de código a mais, mas encontre e corrija imediatamente o problema. Ainda não aconteceu na história da programação de o código que não estivesse compilando começasse a funcionar após a adição de mais linhas de código. Duvido que tal evento ocorra durante este curso também.
+
+A depuração (debug) "old-school", baseada na impressão no Console, é sempre uma das melhores opções. Se o componente
+```js
+const Botao = ({ handleClique, texto }) => (
+  <button onClick={handleClique}>
+    {texto}
+  </button>
+)
+```
+não estiver funcionando como desejado, é útil começar a imprimir suas variáveis ​​no console. Para que isso funcione, devemos transformar nossa função na forma menos compactada e receber todo o objeto "props" sem desestruturá-lo de forma imediata:
+```js
+const Botao = (props) => { 
+  console.log(props)
+  const { handleClique, texto } = props
+  return (
+    <button onClick={handleClique}>
+      {texto}
+    </button>
+  )
+}
+```
+Isso revelará imediatamente se, por exemplo, um dos atributos foi escrito incorretamente ao usar o componente.
+
+Obs.: Quando você usar console.log para depuração, não combine objetos (objects) do jeito Java de se fazer usando o operador de adição. Em vez de escrever
+
+console.log('o valor de props é ' + props)
+separe as coisas que você deseja registrar no console com uma vírgula:
+
+console.log('o valor de props é', props)
+Se você usar o jeito Java de concatenar uma string com um objeto, aparecerá uma mensagem de log muito pouco informativa:
+
+o valor de props é [object Object]
+Registrar a saída no console não é de maneira alguma a única forma de depurar nossas aplicações. Você pode pausar a execução do código da sua aplicação no depurador (debugger) no Console do Desenvolvedor do Chrome, escrevendo o comando debugger em qualquer lugar do seu código.
+
+A execução será pausada assim que chegar a um ponto onde o comando debugger for executado:
+
+Ao ir para a guia Console, é fácil inspecionar o estado atual das variáveis:
+
+captura de tela de inspeção de console
+Uma vez que a causa do erro é descoberta, é possível remover o comando debugger e atualizar a página.
+
+O depurador também nos permite executar nosso código linha por linha com os controles encontrados na parte direita da guia Fontes (Sources).
+
+Você também pode acessar o depurador sem o comando debugger, adicionando pontos de interrupção na guia Fontes (Sources). Inspecionar os valores das variáveis do componente pode ser feito na seção Escopo (Scope):
+
+exemplo de ponto de interrupção nas ferramentas do desenvolvedor
+É extremamente recomendado adicionar a extensão React developer tools ao Chrome. Ele adiciona uma nova guia Components às ferramentas de desenvolvedor. A nova guia de ferramentas de desenvolvedor pode ser usada para inspecionar os diferentes elementos React na aplicação, juntamente com seu estado e props:
+
+captura de tela da extensão de ferramentas de desenvolvedor React
+O estado do componente App é definido assim:
+```js
+const [esquerda, setEsquerda] = useState(0)
+const [direita, setDireita] = useState(0)
+const [todosOsCliques, setTodos] = useState([])
+```
+As ferramentas do desenvolvedor mostram o estado dos hooks na ordem de sua definição:
+
+estado dos hooks nas ferramentas do desenvolvedor React
+O primeiro State (Estado) contém o valor do estado esquerda; o próximo contém o valor do estado direita e o último contém o valor do estado todosOsCliques.
 
 
+## Regras dos Hooks
 
+Há algumas limitações e regras que devemos seguir para garantir que a nossa aplicação use corretamente as funções de estado baseadas em hooks.
 
+A função useState ("usarEstado", assim como a função useEffect, ou "usarEfeito", introduzida mais tarde neste curso) não deve ser chamada dentro de um loop, uma expressão condicional ou qualquer lugar que não seja uma função que define um componente. Assim deve ser para garantir que os hooks sejam sempre chamados na mesma ordem e, se isso não acontecer, a aplicação se apresentará erros.
 
+Resumindo, hooks só podem ser chamados de dentro do corpo de uma função que define um componente React:
+```js
+const App = () => {
+  // Desta forma funciona!
+  const [idade, setIdade] = useState(0)
+  const [nome, setNome] = useState('Juha Tauriainen')
 
+  if ( idade > 10 ) {
+    // Desta forma não funciona!
+    const [foobar, setFoobar] = useState(null)
+  }
 
+  for ( let i = 0; i < idade; i++ ) {
+    // Não faça deste jeito também!
+    const [formaCorreta, setFormaCorreta] = useState(false)
+  }
 
+  const bemRuim = () => {
+    // Isso também não é permitido!
+    const [x, setX] = useState(-1000)
+  }
 
+  return (
+    //...
+  )
+}
+```
 
+Código até aqui
+```js
+import React from "react"
+import { useState } from "react"
 
+const Historico = (props) => {
+  console.log(props)
+  if (props.todosOsCliques.length === 0){
+    return(
+      <div>
+        Clique em um dos botões para usar a aplicação.
+      </div>
+    )
+  }
+  return (
+    <div>
+      Histórico de cliques: {props.todosOsCliques.join(' ')}
+    </div>
+  )
+}
 
+const Botao = ({ handleClique, texto }) => (
+  <button onClick={handleClique}>
+    {texto}
+  </button>
+)
 
+const App = () => {
+  const [esquerda, setEsquerda] = useState(0)
+  const [centro, setCentro] = useState(0)
+  const [direita, setDireita] = useState(0)
+  const [total, setTotal] = useState(0)
+  const [todosOsCliques, setTodos] = useState([])
 
+  const handleCliqueEsquerda = () => {
+    setTodos(todosOsCliques.concat('E'))
+    const atualizarEsquerda = esquerda + 1
+    setEsquerda(atualizarEsquerda)
+    setTotal(atualizarEsquerda + direita + centro)
+  }
+  
+  const handleCliqueCentro = () =>{
+    setTodos(todosOsCliques.concat('C'))
+    const atualizarCentro = centro + 1
+    setCentro(atualizarCentro)
+    setTotal(atualizarCentro + direita + esquerda)
+  } 
 
+  const handleCliqueDireita = () => {
+    setTodos(todosOsCliques.concat('D'))
+    const atualizarDireita = direita + 1
+    setDireita(atualizarDireita)
+    setTotal(esquerda + atualizarDireita + centro)
+  }
+  console.log(total)
 
+    return(
+    <div>
+      {esquerda}
+      <Botao handleClique={handleCliqueEsquerda} texto='Esquerda'/>
+      <br></br>
+      {centro}
+      <Botao handleClique={handleCliqueCentro} texto='Centro'/>
+      <br></br>
+      {direita}
+      <Botao handleClique={handleCliqueDireita}texto='Direita'/>
+      <p>Total {total}</p>
+      <Historico todosOsCliques={todosOsCliques} />
+    </div>
+  )
+}
 
+export default App
+```
 
+## Revisão sobre Gerenciamento de Eventos (Event Handling)
+
+O gerenciamento de eventos se mostrou um tópico difícil em iterações anteriores neste curso.
+
+Por essa razão, revisaremos o tópico.
+
+Vamos supor que estejamos desenvolvendo essa aplicação simples com o seguinte componente App:
 
 
 
