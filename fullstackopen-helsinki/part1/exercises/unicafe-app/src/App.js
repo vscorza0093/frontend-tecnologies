@@ -56,8 +56,8 @@ const App = () => {
   const VoteAnecdote = () => {
     const copia = [ ...votes]
     copia[randNum] += 1
-    setVotes(copia)
     const indexOfMax = copia.indexOf(Math.max(...copia))
+    setVotes(copia)
     setWinnerAnecdote(indexOfMax)
   }
   
