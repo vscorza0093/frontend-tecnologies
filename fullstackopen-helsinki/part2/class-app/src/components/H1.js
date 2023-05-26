@@ -1,7 +1,3 @@
-const H1 = ( {text} ) => {
-    return (
-      <h1>{text}</h1>
-    )
-  }
+const H1 = ( {text} ) => (<h1>{text}</h1>)
 
-  export default H1
+export default H1
